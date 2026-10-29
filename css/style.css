@@ -279,3 +279,21 @@ a.btn { text-decoration: none; display: inline-block; }
 .stock-stack .pinta { position: absolute; left: calc(var(--cw) * .55); top: calc(var(--cw) * .15); transform: rotate(90deg); transform-origin: top left; z-index: -1; opacity: .95; }
 .trick-pair { display: flex; gap: 8px; }
 .stock-stack { margin-right: calc(var(--cw) * .9); }
+
+/* Le Rami */
+.card.joker { background: linear-gradient(160deg, #f3e8ff, #cdb4f7); color: #4a1d8a; border-color: #7b57c4; }
+.card.joker .center { font-size: 1.8em; }
+.table.rami { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.opp-row { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 12px; }
+.opp { text-align: center; padding: 6px 10px; border-radius: 10px; }
+.opp.active { background: rgba(255,255,255,.1); }
+.rami-backs { display: flex; justify-content: center; --cw: 20px; margin: 6px 0; max-width: 200px; flex-wrap: wrap; margin-left: auto; margin-right: auto; }
+.rami-backs .card { margin: 0 -5px; }
+.meld-table { background: rgba(0,0,0,.18); border-radius: 12px; padding: 8px 10px; max-height: 260px; overflow-y: auto; }
+.meld-owner { font-size: .8rem; color: var(--gold-soft); margin: 4px 0 2px; }
+.melds { display: flex; flex-wrap: wrap; gap: 8px; }
+.meld { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 3px 6px 5px; text-align: center; }
+.meld .cap { font-size: .7rem; color: #cfe; }
+.cards-row.mini5 { --cw: 34px; gap: 2px; flex-wrap: nowrap; justify-content: center; }
+.staging { background: rgba(255,255,255,.08); border: 1px dashed rgba(255,255,255,.35); border-radius: 10px; padding: 6px 10px; margin-bottom: 8px; }
+.copies { position: absolute; top: -6px; right: -4px; background: #2a6df4; color: #fff; border-radius: 99px; font-size: .7rem; padding: 0 5px; }
