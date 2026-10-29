@@ -16,7 +16,13 @@
       this.button = opts.button == null ? this.players.length - 1 : opts.button;
       this.handNo = 0;
       this.phase = 'idle';
+      // Variant hooks (overridden by subclasses such as five-card draw)
+      this.holeSize = 2;
+      this.firstPhase = 'preflop';
+      this.bettingPhases = ['preflop', 'flop', 'turn', 'river'];
     }
+
+    isLastBettingRound() { return this.phase === 'river'; }
 
     /* ----- helpers ----- */
     get pot() { return this.players.reduce((s, p) => s + p.total, 0); }
@@ -55,12 +61,15 @@
       const headsUp = this.remaining().length === 2;
       this.sbSeat = headsUp ? this.button : this.nextSeat(this.button, p => p.inHand);
       this.bbSeat = this.nextSeat(this.sbSeat, p => p.inHand);
-      this.players.forEach(p => { if (p.inHand) p.hole = [this.deck.pop(), this.deck.pop()]; });
+      this.players.forEach(p => {
+        if (!p.inHand) return;
+        for (let k = 0; k < this.holeSize; k++) p.hole.push(this.deck.pop());
+      });
       this.pay(this.players[this.sbSeat], this.sb);
       this.pay(this.players[this.bbSeat], this.bb);
       this.currentBet = Math.max(this.players[this.sbSeat].bet, this.players[this.bbSeat].bet);
       this.lastRaise = this.bb;
-      this.phase = 'preflop';
+      this.phase = this.firstPhase;
       this.toAct = this.nextSeat(this.bbSeat, p => p.inHand && !p.folded && !p.allIn);
       // blinds all-in edge case: nobody can act
       if (this.toAct < 0 || this.bettors().length < 2 && this.bettors().every(p => p.bet >= this.currentBet)) {
@@ -83,7 +92,7 @@
     }
 
     act(i, action) {
-      if (this.toAct !== i || !['preflop', 'flop', 'turn', 'river'].includes(this.phase)) throw new Error('Not your turn');
+      if (this.toAct !== i || !this.bettingPhases.includes(this.phase)) throw new Error('Not your turn');
       const p = this.players[i];
       const lg = this.legal(i);
       switch (action.type) {
@@ -131,7 +140,7 @@
       this.currentBet = 0;
       this.lastRaise = this.bb;
       this.toAct = null;
-      if (this.phase === 'river') { this.showdown(); return; }
+      if (this.isLastBettingRound()) { this.showdown(); return; }
       this.dealStreet();
     }
 

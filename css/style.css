@@ -227,3 +227,5 @@ details { margin-top: 6px; font-size: .85rem; }
   .raise-box input[type=range] { width: 160px; }
 }
 a.btn { text-decoration: none; display: inline-block; }
+.table.poker .pcards.five { --cw: 34px; gap: 2px; flex-wrap: wrap; }
+.table.poker .pcards.five.mine { --cw: clamp(48px, 6vw, 68px); }
