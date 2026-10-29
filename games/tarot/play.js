@@ -324,7 +324,7 @@
         el('div', { class: 'btn-row' },
           el('button', { class: 'btn primary', onclick: newDeal }, 'Next deal'),
           el('button', { class: 'btn', onclick: close }, 'Review the table'),
-          el('a', { class: 'btn', href: '#/' }, 'Home')))));
+          el('a', { class: 'btn', href: '#/tarot' }, 'Game menu')))));
     }
 
     log(`Deal 1. ${NAMES[game.dealer]} deals; ${NAMES[(game.dealer + 1) % 4]} speaks first.`);

@@ -2,7 +2,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const ctx = vm.createContext({ console }); ctx.window = ctx;
 for (const f of ['cards', 'rules', 'bots', 'game'])
-  vm.runInContext(fs.readFileSync(path.join(__dirname, '../js', f + '.js'), 'utf8'), ctx, { filename: f });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../games/tarot', f + '.js'), 'utf8'), ctx, { filename: f });
 const T = ctx.Tarot;
 const N = +process.argv[2] || 500;
 const assert = (c, m) => { if (!c) throw new Error(m); };

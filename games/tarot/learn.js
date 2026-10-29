@@ -16,7 +16,7 @@
           <li>The deal is played in <strong>18 tricks</strong>. In each trick every player plays one card; the best card wins it.</li>
           <li>Won cards are worth points. The taker must collect <strong>enough points</strong> to fulfil their contract.</li>
         </ul>
-        <div class="note">Don't worry about memorising everything. The next lessons go one step at a time, with small exercises, and in the <a href="#/play">Play</a> mode a coach can highlight legal cards and suggest moves.</div>` }),
+        <div class="note">Don't worry about memorising everything. The next lessons go one step at a time, with small exercises, and in the <a href="#/tarot/play">Play</a> mode a coach can highlight legal cards and suggest moves.</div>` }),
     },
     {
       title: 'The 78 cards',
@@ -169,7 +169,7 @@
           <li>When you can't win a trick, give away your <strong>least valuable</strong> card.</li>
           <li>Keep count of which trumps have been played.</li>
         </ul>
-        <p>Ready? Head to <a href="#/play">Play</a> with the learning aids on, or try the <a href="#/advisor">Hand Advisor</a>.</p>` }),
+        <p>Ready? Head to <a href="#/tarot/play">Play</a> with the learning aids on, or try the <a href="#/tarot/advisor">Hand Advisor</a>.</p>` }),
     },
   ];
 
@@ -178,12 +178,12 @@
     const idx = Math.max(0, Math.min(LESSONS.length - 1, (parseInt(params[0], 10) || 1) - 1));
     const lesson = LESSONS[idx];
     const list = el('ul', { class: 'lesson-list' }, LESSONS.map((l, i) =>
-      el('li', {}, el('a', { href: `#/learn/${i + 1}`, class: i === idx ? 'active' : '' }, `${i + 1}. ${l.title}`))));
+      el('li', {}, el('a', { href: `#/tarot/learn/${i + 1}`, class: i === idx ? 'active' : '' }, `${i + 1}. ${l.title}`))));
     const pager = el('div', { class: 'pager' },
-      idx > 0 ? el('a', { class: 'btn', href: `#/learn/${idx}` }, '← ' + LESSONS[idx - 1].title) : el('span'),
+      idx > 0 ? el('a', { class: 'btn', href: `#/tarot/learn/${idx}` }, '← ' + LESSONS[idx - 1].title) : el('span'),
       idx < LESSONS.length - 1
-        ? el('a', { class: 'btn primary', href: `#/learn/${idx + 2}` }, LESSONS[idx + 1].title + ' →')
-        : el('a', { class: 'btn primary', href: '#/play' }, 'Play a game →'));
+        ? el('a', { class: 'btn primary', href: `#/tarot/learn/${idx + 2}` }, LESSONS[idx + 1].title + ' →')
+        : el('a', { class: 'btn primary', href: '#/tarot/play' }, 'Play a game →'));
     root.append(el('div', { class: 'learn' }, el('aside', {}, list),
       el('article', { class: 'panel lesson' }, el('h2', {}, `${idx + 1}. ${lesson.title}`), lesson.body(), pager)));
   }
@@ -193,7 +193,7 @@
     const keys = Object.keys(T.Drills).filter(k => k !== 'evalTable');
     const cur = keys.includes(params[0]) ? params[0] : keys[0];
     const tabs = el('div', { class: 'btn-row' }, keys.map(k =>
-      el('a', { class: 'btn' + (k === cur ? ' primary' : ''), href: `#/practice/${k}` }, T.Drills[k].title)));
+      el('a', { class: 'btn' + (k === cur ? ' primary' : ''), href: `#/tarot/practice/${k}` }, T.Drills[k].title)));
     const box = el('div', {});
     root.append(el('div', { class: 'panel' }, el('h2', {}, 'Practice drills'),
       el('p', { class: 'muted' }, 'Short, endless exercises on one skill at a time.'), tabs, box));

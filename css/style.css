@@ -202,3 +202,28 @@ table.t th { background: #f6ecd0; }
   .seat .backs { --cw: 24px; }
   .seat .backs .card { margin: 0 -7px; }
 }
+
+.mode.soon { opacity: .55; pointer-events: none; border-style: dashed; }
+
+/* Poker */
+.cards-row.mini { --cw: 34px; gap: 2px; flex-wrap: nowrap; }
+.table.poker { min-height: 520px; }
+.table.poker .seat .stack { font-size: .9rem; color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+.table.poker .pcards { display: flex; justify-content: center; gap: 4px; margin: 6px 0; --cw: 46px; }
+.table.poker .pcards.mine { --cw: clamp(56px, 7vw, 76px); }
+.table.poker .pcards.won .card { box-shadow: 0 0 0 3px #ffd24a, 0 0 14px #ffd24a; }
+.table.poker .seat.folded { opacity: .5; }
+.table.poker .bet { display: inline-block; background: rgba(0,0,0,.35); border-radius: 99px; padding: 1px 10px; font-size: .8rem; }
+.table.poker .handname { font-size: .8rem; color: #ffe9a6; }
+.table.poker .center-area { gap: 10px; }
+.board { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; --cw: clamp(44px, 5.5vw, 64px); }
+.pot { font-size: 1.1rem; }
+.raise-box { display: inline-flex; flex-direction: column; gap: 4px; align-items: center; vertical-align: top; margin-left: 8px; }
+.raise-box input[type=range] { width: 220px; }
+details { margin-top: 6px; font-size: .85rem; }
+.table.poker .actions .seat { margin-top: 6px; }
+@media (max-width: 560px) {
+  .table.poker .pcards { --cw: 36px; }
+  .raise-box input[type=range] { width: 160px; }
+}
+a.btn { text-decoration: none; display: inline-block; }

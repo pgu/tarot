@@ -3,34 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tarot Academy – learn and play French Tarot</title>
-  <meta name="description" content="Learn French Tarot step by step, practise with drills, play against bots with a coach, or get advice on your hand.">
+  <title>Card Academy – learn and play card games</title>
+  <meta name="description" content="Learn classic card games step by step: lessons, drills, games against bots with a coach, and hand advice.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%83%8F%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#/">🃏 Tarot Academy</a>
-    <nav>
-      <a href="#/learn">Learn</a>
-      <a href="#/practice">Practice</a>
-      <a href="#/play">Play</a>
-      <a href="#/advisor">Advisor</a>
-      <a href="#/reference">Reference</a>
-    </nav>
+    <a class="brand" href="#/">🃏 Card Academy</a>
+    <nav id="nav"></nav>
   </header>
   <main id="app"></main>
-  <footer class="footer">French Tarot (4 players) · a learning project · <a href="#/reference">rules &amp; glossary</a></footer>
+  <footer class="footer">Card Academy · learn and play classic card games · <a href="#/">all games</a></footer>
 
-  <script src="js/cards.js"></script>
-  <script src="js/rules.js"></script>
-  <script src="js/bots.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/drills.js"></script>
-  <script src="js/learn.js"></script>
-  <script src="js/play.js"></script>
-  <script src="js/advisor.js"></script>
+  <script src="js/core.js"></script>
+  <!-- French Tarot -->
+  <script src="games/tarot/cards.js"></script>
+  <script src="games/tarot/rules.js"></script>
+  <script src="games/tarot/bots.js"></script>
+  <script src="games/tarot/game.js"></script>
+  <script src="games/tarot/ui.js"></script>
+  <script src="games/tarot/drills.js"></script>
+  <script src="games/tarot/learn.js"></script>
+  <script src="games/tarot/play.js"></script>
+  <script src="games/tarot/advisor.js"></script>
+  <script src="games/tarot/register.js"></script>
+  <!-- Texas Hold'em -->
+  <script src="games/poker/cards.js"></script>
+  <script src="games/poker/game.js"></script>
+  <script src="games/poker/bots.js"></script>
+  <script src="games/poker/ui.js"></script>
+  <script src="games/poker/drills.js"></script>
+  <script src="games/poker/learn.js"></script>
+  <script src="games/poker/play.js"></script>
+  <script src="games/poker/advisor.js"></script>
+  <script src="games/poker/register.js"></script>
   <script src="js/app.js"></script>
+  <script>window.__startRouter();</script>
 </body>
 </html>

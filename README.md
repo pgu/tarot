@@ -1,13 +1,15 @@
-# Tarot Academy
+# Card Academy
 
-Learn and play **French Tarot** (4 players, 78 cards) in the browser. Static site: plain HTML/CSS/JS, no build step.
+Learn and play classic card games in the browser, with lessons, practice drills, games against bots with a coach, and a hand advisor for real cards. Static site: plain HTML/CSS/JS, no build step.
 
-## Modes
-- **Learn**: 9 short lessons (cards, points, bidding, dog, tricks, Excuse, scoring, strategy) with embedded exercises.
-- **Practice**: endless drills: legal cards, trick winner, point counting, bid-or-pass.
-- **Play**: full deal against 3 bots. Learning aids (toggleable): legal-card highlighting, rule explanation, card suggestions, bid advice, discard suggestions, bot reasoning in the log, live point count.
-- **Hand Advisor**: enter your real 18 cards (and optionally the dog) to get a bid suggestion, discard advice and opening lead.
-- **Reference**: deck, scoring cheat-sheet, glossary.
+## Games
+| Game | Status |
+|---|---|
+| **French Tarot** (4 players, 78 cards) | available |
+| **Texas Hold'em** (no-limit, you + 3 bots) | available |
+| Rami, Chinchón, La Escoba, El Tute | planned |
+
+Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
 
 ## Run locally
 Open `index.html` directly, or `python3 -m http.server` and visit http://localhost:8000.
@@ -16,16 +18,26 @@ Open `index.html` directly, or `python3 -m http.server` and visit http://localho
 Repo **Settings → Pages → Deploy from a branch → `main` / root**.
 
 ## Tests
-`node test/sim.js 1000` plays 1000 bot-only deals and checks invariants (78 cards accounted for, 91 points, zero-sum scores).
+```
+node test/tarot.sim.js 1000   # bot-only Tarot deals: 78 cards accounted for, 91 points, zero-sum scores
+node test/poker.eval.js       # hand evaluator, equity, outs, Chen score
+node test/poker.sim.js 1500   # bot-only poker hands: chips conserved, side pots add up
+```
 
 ## Layout
-| File | Role |
-|---|---|
-| `js/cards.js` | deck, point values |
-| `js/rules.js` | legal moves, trick winner, contracts, discard validation |
-| `js/bots.js` | hand evaluation, bidding, discard and card-play heuristics (also used by the coach) |
-| `js/game.js` | one-deal state machine and scoring (no DOM) |
-| `js/ui.js`, `js/play.js`, `js/learn.js`, `js/drills.js`, `js/advisor.js`, `js/app.js` | screens and router |
+```
+index.html            shell; loads every game's scripts
+css/style.css         shared styles (cards, table, panels)
+js/core.js            DOM helper + game registry (Core.register)
+js/app.js             router (#/<game>/<screen>/<params>) and game hub
+games/<game>/         one folder per game, registered in register.js
+  cards, rules/game, bots   engine and AI (no DOM, testable in Node)
+  ui, learn, drills, play, advisor   screens
+```
+To add a game: create `games/<id>/`, build screens as `fn(root, params)`, call `Core.register('<id>', {...})` and add the scripts to `index.html`.
 
-## Not yet in v1
-Poignée, Chelem, 3- and 5-player variants, exact Excuse exchange, multiplayer, smarter bots (card counting).
+Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
+
+## Known simplifications
+- **Tarot:** no Poignée, Chelem or 3/5-player variants; automatic Excuse exchange.
+- **Poker:** one table format (fixed blinds $10/$20, 4 seats), no tournaments; a short all-in raise reopens the betting. Bots use hand strength + Monte Carlo equity vs pot odds, not opponent modelling.
