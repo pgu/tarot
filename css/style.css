@@ -268,3 +268,14 @@ a.btn { text-decoration: none; display: inline-block; }
 .group .hand { min-height: 0; padding: 0; }
 .table.chinchon .actions .hand.flat { justify-content: center; }
 .table select { font: inherit; padding: 2px; }
+
+/* El Tute */
+.table.tute { grid-template-areas: "north north north" "center center center" "south south south"; min-height: 520px; }
+.table.tute .backs { --cw: 30px; display: flex; justify-content: center; margin: 6px 0; }
+.table.tute .backs .card { margin: 0 -9px; }
+.table.tute .stack { font-size: .85rem; color: var(--gold-soft); }
+.empty-slot { width: var(--cw); height: calc(var(--cw) * 1.55); border: 2px dashed rgba(255,255,255,.2); border-radius: 7px; }
+.stock-stack { position: relative; display: inline-block; isolation: isolate; }
+.stock-stack .pinta { position: absolute; left: calc(var(--cw) * .55); top: calc(var(--cw) * .15); transform: rotate(90deg); transform-origin: top left; z-index: -1; opacity: .95; }
+.trick-pair { display: flex; gap: 8px; }
+.stock-stack { margin-right: calc(var(--cw) * .9); }

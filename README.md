@@ -10,7 +10,8 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 | **5-Card Draw** (no-limit, you + 3 bots) | available |
 | **La Escoba** (2 players, Spanish deck) | available |
 | **Chinchón** (2–4 players, Spanish deck) | available |
-| El Tute, Rami, El Mus | planned |
+| **El Tute** (tute arrastrado, 2 players) | available |
+| Rami, El Mus | planned |
 
 Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
 
@@ -28,6 +29,7 @@ node test/poker.sim.js 1500   # bot-only Hold'em hands: chips conserved, side po
 node test/draw.sim.js 1500    # bot-only 5-card draw hands (draw phase, chips, pots)
 node test/escoba.sim.js 300   # bot-only Escoba games: all 40 cards end up in piles, scoring
 node test/chinchon.sim.js 200 # bot-only Chinchón games (2-4 players): meld rules, closing, 40 cards conserved
+node test/tute.sim.js 500     # bot-only Tute hands: trick rules, 120 card points, cantes, 40 cards conserved
 ```
 
 ## Layout
@@ -48,6 +50,7 @@ Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
 - **Tarot:** no Poignée, Chelem or 3/5-player variants; automatic Excuse exchange.
+- **Tute:** 2-player tute arrastrado only; no swap of the 2 of triumph; no obligation to lead from a sung pair.
 - **Chinchón:** no comodines (jokers); a round nobody can close after 60 turns is void (tablas).
 - **Escoba:** 2 players only; a card that can capture must capture.
 - **Poker (Hold'em and Draw):** one table format (fixed blinds $10/$20, 4 seats), no tournaments; a short all-in raise reopens the betting. Bots use hand strength + Monte Carlo equity vs pot odds, not opponent modelling.
