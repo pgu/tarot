@@ -10,7 +10,6 @@
   let cleanup = null;
 
   const COMING = [
-    ['🂱', 'El Mus', 'Spanish bidding card game with the 40-card deck: pairs, juego, envites.'],
   ];
 
   function hub(root) {

@@ -303,3 +303,15 @@ a.btn { text-decoration: none; display: inline-block; }
 .lang-btn { font: inherit; font-size: .8rem; cursor: pointer; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.4); padding: 2px 9px; }
 .lang-btn:first-child { border-radius: 6px 0 0 6px; } .lang-btn:last-child { border-radius: 0 6px 6px 0; }
 .lang-btn.active { background: var(--gold); border-color: var(--gold); }
+
+/* El Mus */
+.table.mus { grid-template-areas: ". north ." "west center east" "south south south"; min-height: 520px; }
+.table.mus .backs { --cw: 30px; display: flex; justify-content: center; margin: 6px 0; }
+.table.mus .backs .card { margin: 0 -8px; }
+.lance-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.lance-pill { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); border-radius: 99px; padding: 3px 12px; font-size: .85rem; }
+.lance-pill.current { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 700; }
+.lance-pill.done { opacity: .85; }
+.scorebar { height: 10px; background: #e6dcc0; border-radius: 99px; overflow: hidden; margin-top: 3px; }
+.scorebar .fill { height: 100%; }
+.scorebar .fill.us { background: #1e9c55; } .scorebar .fill.them { background: #c0392b; }

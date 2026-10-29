@@ -12,7 +12,7 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 | **Chinchón** (2–4 players, Spanish deck) | available |
 | **El Tute** (tute arrastrado, 2 players) | available |
 | **Le Rami** (2–4 players, 108 cards) | available · French only |
-| El Mus | planned |
+| **El Mus** (2 couples, mus a 8 reyes) | available |
 
 Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
 
@@ -31,6 +31,7 @@ node test/draw.sim.js 1500    # bot-only 5-card draw hands (draw phase, chips, p
 node test/escoba.sim.js 300   # bot-only Escoba games: all 40 cards end up in piles, scoring
 node test/chinchon.sim.js 200 # bot-only Chinchón games (2-4 players): meld rules, closing, 40 cards conserved
 node test/tute.sim.js 500     # bot-only Tute hands: trick rules, 120 card points, cantes, 40 cards conserved
+node test/mus.sim.js 100      # Mus rules (grande, chica, pares, juego) + bot-only games to 40 piedras
 node test/rami.eval.js        # Rami combination rules (sets, runs, jokers, ace, arrangement search)
 node test/rami.sim.js 12      # bot-only Rami games: 108 cards conserved, every round ends
 ```
@@ -55,6 +56,7 @@ Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
 - **Tarot:** no Poignée, Chelem or 3/5-player variants; automatic Excuse exchange.
+- **Mus:** mus a 8 reyes, one game to 40 piedras (no vacas), bets of 2 or 5 plus órdago, no señas (your partner is a bot).
 - **Rami:** opening at 51 + a pure suite; at most one joker per combination; unopened players count a flat 100 penalty; fixed number of rounds.
 - **Tute:** 2-player tute arrastrado only; no swap of the 2 of triumph; no obligation to lead from a sung pair.
 - **Chinchón:** no comodines (jokers); a round nobody can close after 60 turns is void (tablas).
