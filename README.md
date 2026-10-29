@@ -8,7 +8,8 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 | **French Tarot** (4 players, 78 cards) | available |
 | **Texas Hold'em** (no-limit, you + 3 bots) | available |
 | **5-Card Draw** (no-limit, you + 3 bots) | available |
-| Rami, Chinchón, La Escoba, El Tute | planned |
+| **La Escoba** (2 players, Spanish deck) | available |
+| Rami, Chinchón, El Tute | planned |
 
 Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
 
@@ -24,6 +25,7 @@ node test/tarot.sim.js 1000   # bot-only Tarot deals: 78 cards accounted for, 91
 node test/poker.eval.js       # hand evaluator, equity, outs, Chen score
 node test/poker.sim.js 1500   # bot-only Hold'em hands: chips conserved, side pots add up
 node test/draw.sim.js 1500    # bot-only 5-card draw hands (draw phase, chips, pots)
+node test/escoba.sim.js 300   # bot-only Escoba games: all 40 cards end up in piles, scoring
 ```
 
 ## Layout
@@ -33,7 +35,8 @@ css/style.css         shared styles (cards, table, panels)
 js/core.js            DOM helper + game registry (Core.register)
 js/app.js             router (#/<game>/<screen>/<params>) and game hub
 games/<game>/         one folder per game, registered in register.js
-                      (games/draw/ builds on the engine in games/poker/)
+                      (games/draw/ builds on the engine in games/poker/;
+                       games/escoba/ and future Spanish games share games/spanish/)
   cards, rules/game, bots   engine and AI (no DOM, testable in Node)
   ui, learn, drills, play, advisor   screens
 ```
@@ -43,4 +46,5 @@ Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
 - **Tarot:** no Poignée, Chelem or 3/5-player variants; automatic Excuse exchange.
+- **Escoba:** 2 players only; a card that can capture must capture.
 - **Poker (Hold'em and Draw):** one table format (fixed blinds $10/$20, 4 seats), no tournaments; a short all-in raise reopens the betting. Bots use hand strength + Monte Carlo equity vs pot odds, not opponent modelling.
