@@ -2,7 +2,7 @@
 (function (T) {
   'use strict';
 
-  const SEAT_NAMES = ['You', 'East', 'North', 'West'];
+  const tr = window.Core.t;
   const TOTAL_TRICKS = 18;
 
   class Game {
@@ -44,9 +44,9 @@
     }
 
     bid(player, contract) {
-      if (this.phase !== 'bidding' || player !== this.bidder) throw new Error('Not your turn to bid');
+      if (this.phase !== 'bidding' || player !== this.bidder) throw new Error(tr('Not your turn to bid', 'Ce n\'est pas votre tour d\'annoncer.'));
       if (contract) {
-        if (!this.canBid(contract)) throw new Error('Bid too low');
+        if (!this.canBid(contract)) throw new Error(tr('Bid too low', 'Annonce trop faible.'));
         this.highest = { player, contract };
       }
       this.bids.push({ player, contract: contract || null });
@@ -67,13 +67,13 @@
     }
 
     takeDog() {
-      if (this.phase !== 'dog') throw new Error('No dog to take');
+      if (this.phase !== 'dog') throw new Error(tr('No dog to take', 'Pas de chien à prendre.'));
       this.hands[this.taker] = T.sortHand(this.hands[this.taker].concat(this.dog));
       this.phase = 'discard';
     }
 
     discard(cards) {
-      if (this.phase !== 'discard') throw new Error('Not discarding');
+      if (this.phase !== 'discard') throw new Error(tr('Not discarding', 'Ce n\'est pas le moment d\'écarter.'));
       const err = T.validateDiscard(this.hands[this.taker], cards);
       if (err) throw new Error(err);
       this.hands[this.taker] = this.hands[this.taker].filter(c => !cards.includes(c));
@@ -95,9 +95,9 @@
     legalFor(player) { return T.legalInfo(this.hands[player], this.trick); }
 
     play(player, card) {
-      if (this.phase !== 'play' || this.turn !== player) throw new Error('Not your turn');
-      if (!this.hands[player].includes(card)) throw new Error('Card not in hand');
-      if (!this.legalFor(player).cards.includes(card)) throw new Error('Illegal card');
+      if (this.phase !== 'play' || this.turn !== player) throw new Error(tr('Not your turn', 'Ce n\'est pas votre tour.'));
+      if (!this.hands[player].includes(card)) throw new Error(tr('Card not in hand', 'Cette carte n\'est pas dans votre main.'));
+      if (!this.legalFor(player).cards.includes(card)) throw new Error(tr('Illegal card', 'Carte interdite.'));
       this.hands[player] = this.hands[player].filter(c => c !== card);
       this.trick.push({ player, card });
       this.turn = this.trick.length === 4 ? null : (player + 1) % 4;
@@ -106,7 +106,7 @@
     get trickComplete() { return this.trick.length === 4; }
 
     collectTrick() {
-      if (!this.trickComplete) throw new Error('Trick not complete');
+      if (!this.trickComplete) throw new Error(tr('Trick not complete', 'Le pli n\'est pas terminé.'));
       const idx = T.trickWinnerIndex(this.trick);
       const winner = this.trick[idx].player;
       const winTeam = this.team(winner);
@@ -207,6 +207,6 @@
   }
 
   T.Game = Game;
-  T.SEAT_NAMES = SEAT_NAMES;
+  Object.defineProperty(T, 'SEAT_NAMES', { get: () => tr(['You', 'East', 'North', 'West'], ['Vous', 'Est', 'Nord', 'Ouest']), enumerable: true });
   T.TOTAL_TRICKS = TOTAL_TRICKS;
 })(window.Tarot = window.Tarot || {});

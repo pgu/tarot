@@ -5,13 +5,13 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 ## Games
 | Game | Status |
 |---|---|
-| **French Tarot** (4 players, 78 cards) | available |
+| **French Tarot** (4 players, 78 cards) | available · EN / FR switch |
 | **Texas Hold'em** (no-limit, you + 3 bots) | available |
 | **5-Card Draw** (no-limit, you + 3 bots) | available |
 | **La Escoba** (2 players, Spanish deck) | available |
 | **Chinchón** (2–4 players, Spanish deck) | available |
 | **El Tute** (tute arrastrado, 2 players) | available |
-| **Le Rami** (2–4 players, 108 cards) | available |
+| **Le Rami** (2–4 players, 108 cards) | available · French only |
 | El Mus | planned |
 
 Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
@@ -24,7 +24,7 @@ Repo **Settings → Pages → Deploy from a branch → `main` / root**.
 
 ## Tests
 ```
-node test/tarot.sim.js 1000   # bot-only Tarot deals: 78 cards accounted for, 91 points, zero-sum scores
+node test/tarot.sim.js 1000   # bot-only Tarot deals: 78 cards accounted for, 91 points, zero-sum scores (LANG_FR=1 to run in French)
 node test/poker.eval.js       # hand evaluator, equity, outs, Chen score
 node test/poker.sim.js 1500   # bot-only Hold'em hands: chips conserved, side pots add up
 node test/draw.sim.js 1500    # bot-only 5-card draw hands (draw phase, chips, pots)
@@ -47,6 +47,8 @@ games/<game>/         one folder per game, registered in register.js
   cards, rules/game, bots   engine and AI (no DOM, testable in Node)
   ui, learn, drills, play, advisor   screens
 ```
+**Languages:** a game that supports several languages declares `langs: ['en', 'fr']` in `Core.register` and writes every visible string as `Core.t(english, french)` (evaluated at render time). The header then shows an EN / FR switch (remembered in the browser; switching restarts the current screen). Card names and rule texts are getters so they follow the language. Games without `langs` show no switch.
+
 To add a game: create `games/<id>/`, build screens as `fn(root, params)`, call `Core.register('<id>', {...})` and add the scripts to `index.html`.
 
 Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.

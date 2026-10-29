@@ -2,23 +2,25 @@
 (function (T) {
   'use strict';
 
+  const tr = window.Core.t;
+  const takerDog = () => tr('Taker sees the dog, takes it, discards 6 cards.', 'Le preneur voit le chien, le prend et écarte 6 cartes.');
   const CONTRACTS = {
-    petite: { key: 'petite', level: 1, name: 'Petite', mult: 1, dog: 'Taker sees the dog, takes it, discards 6 cards.' },
-    garde: { key: 'garde', level: 2, name: 'Garde', mult: 2, dog: 'Taker sees the dog, takes it, discards 6 cards.' },
-    sans: { key: 'sans', level: 3, name: 'Garde Sans', mult: 4, dog: 'Dog is not shown; it counts for the taker.' },
-    contre: { key: 'contre', level: 4, name: 'Garde Contre', mult: 6, dog: 'Dog is not shown; it counts for the defenders.' },
+    petite: { key: 'petite', level: 1, mult: 1, get name() { return 'Petite'; }, get dog() { return takerDog(); } },
+    garde: { key: 'garde', level: 2, mult: 2, get name() { return 'Garde'; }, get dog() { return takerDog(); } },
+    sans: { key: 'sans', level: 3, mult: 4, get name() { return tr('Garde Sans', 'Garde sans'); }, get dog() { return tr('Dog is not shown; it counts for the taker.', 'Le chien n\'est pas montré ; il compte pour le preneur.'); } },
+    contre: { key: 'contre', level: 4, mult: 6, get name() { return tr('Garde Contre', 'Garde contre'); }, get dog() { return tr('Dog is not shown; it counts for the defenders.', 'Le chien n\'est pas montré ; il compte pour les défenseurs.'); } },
   };
   const CONTRACT_ORDER = ['petite', 'garde', 'sans', 'contre'];
 
   const RULE_TEXT = {
-    lead: 'You lead the trick: any card is allowed.',
-    'excuse-led': 'The Excuse was led, so the next card played sets the suit. As the next player you may lead anything.',
-    follow: 'You must follow the suit that was led. (The Excuse is always allowed too.)',
-    overtrump: 'You must play a higher trump than the best trump already in the trick.',
-    undertrump: 'You cannot beat the best trump, but you still must play a trump (any trump).',
-    'must-trump': 'You have no card of the suit led, so you must play a trump.',
-    'no-trump': 'Trump was led but you hold no trump, so you may play any card.',
-    free: 'You have neither the suit led nor any trump, so you may play any card.',
+    get lead() { return tr('You lead the trick: any card is allowed.', 'Vous entamez le pli : n\'importe quelle carte est permise.'); },
+    get 'excuse-led'() { return tr('The Excuse was led, so the next card played sets the suit. As the next player you may lead anything.', 'L\'Excuse a été jouée en premier : la carte suivante détermine la couleur du pli. Comme joueur suivant, vous pouvez entamer avec n\'importe quelle carte.'); },
+    get follow() { return tr('You must follow the suit that was led. (The Excuse is always allowed too.)', 'Vous devez fournir à la couleur demandée. (L\'Excuse est toujours permise.)'); },
+    get overtrump() { return tr('You must play a higher trump than the best trump already in the trick.', 'Vous devez jouer un atout plus fort que le meilleur atout déjà dans le pli (surcouper).'); },
+    get undertrump() { return tr('You cannot beat the best trump, but you still must play a trump (any trump).', 'Vous ne pouvez pas battre le meilleur atout, mais vous devez quand même jouer un atout (n\'importe lequel).'); },
+    get 'must-trump'() { return tr('You have no card of the suit led, so you must play a trump.', 'Vous n\'avez pas la couleur demandée : vous devez couper avec un atout.'); },
+    get 'no-trump'() { return tr('Trump was led but you hold no trump, so you may play any card.', 'On a demandé de l\'atout mais vous n\'en avez pas : vous pouvez jouer n\'importe quelle carte.'); },
+    get free() { return tr('You have neither the suit led nor any trump, so you may play any card.', 'Vous n\'avez ni la couleur demandée ni d\'atout : vous pouvez jouer n\'importe quelle carte.'); },
   };
 
   function leadSuit(trick) {
@@ -79,13 +81,13 @@
 
   /** Validate a discard of 6 cards from the 24-card hand. Returns error string or null. */
   function validateDiscard(hand, cards) {
-    if (cards.length !== 6) return 'Choose exactly 6 cards.';
-    if (cards.some(c => c.oudler)) return 'You may never discard an oudler (21, Petit, Excuse).';
-    if (cards.some(c => c.suit !== 'T' && c.rank === 14)) return 'You may not discard a King.';
+    if (cards.length !== 6) return tr('Choose exactly 6 cards.', 'Choisissez exactement 6 cartes.');
+    if (cards.some(c => c.oudler)) return tr('You may never discard an oudler (21, Petit, Excuse).', 'On ne peut jamais écarter un bout (21, Petit, Excuse).');
+    if (cards.some(c => c.suit !== 'T' && c.rank === 14)) return tr('You may not discard a King.', 'On ne peut pas écarter un roi.');
     const candidates = hand.filter(c => !c.oudler && c.suit !== 'T' && c.rank !== 14);
     const trumpCount = cards.filter(c => c.suit === 'T').length;
     if (trumpCount > Math.max(0, 6 - candidates.length)) {
-      return 'You may only discard a trump if you cannot fill the 6 cards with other cards (no oudlers/kings).';
+      return tr('You may only discard a trump if you cannot fill the 6 cards with other cards (no oudlers/kings).', 'Vous ne pouvez écarter un atout que si vous ne pouvez pas compléter les 6 cartes avec d\'autres cartes (ni bouts, ni rois).');
     }
     return null;
   }

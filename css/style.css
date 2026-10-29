@@ -297,3 +297,9 @@ a.btn { text-decoration: none; display: inline-block; }
 .cards-row.mini5 { --cw: 34px; gap: 2px; flex-wrap: nowrap; justify-content: center; }
 .staging { background: rgba(255,255,255,.08); border: 1px dashed rgba(255,255,255,.35); border-radius: 10px; padding: 6px 10px; margin-bottom: 8px; }
 .copies { position: absolute; top: -6px; right: -4px; background: #2a6df4; color: #fff; border-radius: 99px; font-size: .7rem; padding: 0 5px; }
+
+/* Language switch */
+.lang-switch { display: flex; gap: 2px; }
+.lang-btn { font: inherit; font-size: .8rem; cursor: pointer; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.4); padding: 2px 9px; }
+.lang-btn:first-child { border-radius: 6px 0 0 6px; } .lang-btn:last-child { border-radius: 0 6px 6px 0; }
+.lang-btn.active { background: var(--gold); border-color: var(--gold); }

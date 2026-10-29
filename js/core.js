@@ -2,6 +2,12 @@
 (function () {
   'use strict';
 
+  // Make Element.append tolerant: skip null/undefined/false and flatten arrays (native append would print "null").
+  const nativeAppend = Element.prototype.append;
+  Element.prototype.append = function (...nodes) {
+    return nativeAppend.apply(this, nodes.flat(Infinity).filter(n => n != null && n !== false));
+  };
+
   function el(tag, props, ...kids) {
     const e = document.createElement(tag);
     for (const [k, v] of Object.entries(props || {})) {
@@ -20,9 +26,28 @@
     return e;
   }
 
+  /* ---- language: games that support several languages call Core.t(en, fr) at render time ---- */
+  const LANG_KEY = 'cardacademy.lang';
+  let lang = 'en';
+  try { const saved = localStorage.getItem(LANG_KEY); if (saved === 'fr' || saved === 'en') lang = saved; } catch (e) { /* ignore */ }
+  const langListeners = [];
+  const t = (en, fr) => (lang === 'fr' && fr != null ? fr : en);
+  function setLang(l) {
+    if (l !== 'en' && l !== 'fr') return;
+    lang = l;
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) { /* ignore */ }
+    document.documentElement.lang = l;
+    langListeners.forEach(fn => fn(l));
+  }
+
   const games = {};
   /** def: {title, icon, tagline, players, intro, screens:{name:fn(root, params)}, menu:[{screen, icon, title, text}]} */
   function register(id, def) { games[id] = Object.assign({ id }, def); }
 
-  window.Core = { el, games, register };
+  window.Core = {
+    el, games, register, t, setLang,
+    get lang() { return lang; },
+    onLang(fn) { langListeners.push(fn); },
+  };
+  document.documentElement.lang = lang;
 })();

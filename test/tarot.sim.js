@@ -1,6 +1,7 @@
 // Headless simulation: node test/sim.js [games]
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const ctx = vm.createContext({ console }); ctx.window = ctx;
+ctx.Core = { t: (en, fr) => (process.env.LANG_FR ? fr : en), get lang() { return process.env.LANG_FR ? 'fr' : 'en'; } }; // i18n stub
 for (const f of ['cards', 'rules', 'bots', 'game'])
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../games/tarot', f + '.js'), 'utf8'), ctx, { filename: f });
 const T = ctx.Tarot;

@@ -2,9 +2,11 @@
 (function (T) {
   'use strict';
 
+  const tr = window.Core.t;
   const sameTeam = (taker, a, b) => (a === taker) === (b === taker);
   const isSuitCard = c => c.suit !== 'T' && c.suit !== 'X';
-  const fmt = n => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+  const fmt = n => { const x = Number.isInteger(n) ? String(n) : n.toFixed(1); return window.Core.lang === 'fr' ? x.replace('.', ',') : x; };
+  const sn = s => tr(T.SUIT_INFO[s].name, T.SUIT_INFO[s].name.toLowerCase());
 
   /* ---------- Hand evaluation / bidding ---------- */
 
@@ -23,19 +25,19 @@
     let score = 0;
     const add = (label, value, note) => { if (value) { score += value; details.push({ label, value, note }); } };
 
-    add(`${trumps.length} trump(s)`, trumps.length, 'Trumps win tricks and protect your kings. 1 point each.');
+    add(tr(`${trumps.length} trump(s)`, `${trumps.length} atout(s)`), trumps.length, tr('Trumps win tricks and protect your kings. 1 point each.', 'Les atouts font gagner des plis et protègent vos rois. 1 point chacun.'));
     let oudlerValue = oudlers.length * 4;
-    let oudlerNote = 'Oudlers (21, Petit, Excuse) lower the points you need and are worth 4.5 each.';
+    let oudlerNote = tr('Oudlers (21, Petit, Excuse) lower the points you need and are worth 4.5 each.', 'Les bouts (21, Petit, Excuse) abaissent les points à réaliser et valent 4,5 chacun.');
     if (hasPetit && trumps.length < 6) {
       oudlerValue -= 2;
-      oudlerNote += ' The Petit is fragile with fewer than 6 trumps, so it counts for less.';
+      oudlerNote += tr(' The Petit is fragile with fewer than 6 trumps, so it counts for less.', ' Le Petit est fragile avec moins de 6 atouts : il compte donc moins.');
     }
-    add(`${oudlers.length} oudler(s)`, oudlerValue, oudlerNote);
-    add(`${kings.length} king(s)`, kings.length * 2, 'Kings usually win their suit early.');
-    add(`${queens.length} queen(s)`, queens.length, 'Queens are decent but can be captured by a king.');
-    add(`${big.length} big trump(s) (15+)`, big.length * 1.5, 'High trumps win tricks late in the deal.');
+    add(tr(`${oudlers.length} oudler(s)`, `${oudlers.length} bout(s)`), oudlerValue, oudlerNote);
+    add(tr(`${kings.length} king(s)`, `${kings.length} roi(s)`), kings.length * 2, tr('Kings usually win their suit early.', 'Les rois gagnent généralement leur couleur tôt.'));
+    add(tr(`${queens.length} queen(s)`, `${queens.length} dame(s)`), queens.length, tr('Queens are decent but can be captured by a king.', 'Les dames sont bonnes mais peuvent être prises par un roi.'));
+    add(tr(`${big.length} big trump(s) (15+)`, `${big.length} gros atout(s) (15+)`), big.length * 1.5, tr('High trumps win tricks late in the deal.', 'Les gros atouts font gagner des plis en fin de donne.'));
     if (trumps.length >= 4) {
-      add(`${voids.length} void suit(s)`, voids.length * 1.5, 'With no cards in a suit you can ruff (trump) it.');
+      add(tr(`${voids.length} void suit(s)`, `${voids.length} chicane(s)`), voids.length * 1.5, tr('With no cards in a suit you can ruff (trump) it.', 'Sans carte dans une couleur (chicane), vous pouvez la couper à l\'atout.'));
     }
 
     let level = null;
@@ -59,8 +61,9 @@
     const raise = want && levelOf(want) > (highest ? levelOf(highest.contract) : 0);
     return {
       contract: raise ? want : null,
-      reason: `Hand strength ${fmt(ev.score)}: ${ev.trumps} trumps, ${ev.oudlers} oudler(s), ${ev.kings} king(s).` +
-        (raise ? ` Enough for ${T.CONTRACTS[want].name}.` : ' Not enough to outbid.'),
+      reason: tr(`Hand strength ${fmt(ev.score)}: ${ev.trumps} trumps, ${ev.oudlers} oudler(s), ${ev.kings} king(s).`,
+        `Force de la main ${fmt(ev.score)} : ${ev.trumps} atouts, ${ev.oudlers} bout(s), ${ev.kings} roi(s).`) +
+        (raise ? tr(` Enough for ${T.CONTRACTS[want].name}.`, ` Suffisant pour une ${T.CONTRACTS[want].name}.`) : tr(' Not enough to outbid.', ' Pas assez pour surenchérir.')),
       eval: ev,
     };
   }
@@ -84,11 +87,11 @@
     }
     const remaining = hand24.filter(c => !picked.includes(c));
     const newVoids = T.SUITS.filter(s => suitLen[s] > 0 && !remaining.some(c => c.suit === s));
-    let reason = 'Discard low cards from your shortest suits (never kings or oudlers)';
+    let reason = tr('Discard low cards from your shortest suits (never kings or oudlers)', 'Écartez de petites cartes de vos couleurs les plus courtes (jamais de rois ni de bouts)');
     if (newVoids.length) {
-      reason += ` to create a void in ${newVoids.map(s => T.SUIT_INFO[s].name).join(' and ')}, so you can trump it later`;
+      reason += tr(` to create a void in ${newVoids.map(s => T.SUIT_INFO[s].name).join(' and ')}, so you can trump it later`, ` pour faire chicane à ${newVoids.map(sn).join(' et ')}, afin de pouvoir couper plus tard`);
     }
-    if (picked.some(c => c.suit === 'T')) reason += '. Low trumps were needed to fill the 6 cards';
+    if (picked.some(c => c.suit === 'T')) reason += tr('. Low trumps were needed to fill the 6 cards', '. Il a fallu écarter de petits atouts pour compléter les 6 cartes');
     return { cards: T.sortHand(picked), reason: reason + '.' };
   }
 
@@ -108,11 +111,11 @@
 
     if (isTaker && trumpCount >= 6) {
       const draw = trumps.filter(c => c.rank !== 1).pop();
-      if (draw) return { card: draw, reason: `You hold ${trumpCount} trumps: lead your highest to draw out the defenders' trumps.` };
+      if (draw) return { card: draw, reason: tr(`You hold ${trumpCount} trumps: lead your highest to draw out the defenders' trumps.`, `Vous avez ${trumpCount} atouts : jouez le plus fort pour faire tomber les atouts des défenseurs.`) };
     }
     const kings = nonTrump.filter(c => c.rank === 14).sort((a, b) => suitCards(b.suit) - suitCards(a.suit));
     if (kings.length && ctx.trickNo < 12) {
-      return { card: kings[0], reason: `Leading the ${kings[0].name} is a strong start: a king usually wins 4.5 points.` };
+      return { card: kings[0], reason: tr(`Leading the ${kings[0].name} is a strong start: a king usually wins 4.5 points.`, `Entamer avec ${kings[0].name} est un bon début : un roi remporte généralement 4,5 points.`) };
     }
     if (nonTrump.length) {
       const bySuit = {};
@@ -123,13 +126,13 @@
       return {
         card,
         reason: isTaker
-          ? `Probe your longest suit (${T.SUIT_INFO[pick].name}) with a low card.`
-          : `Lead low in your shortest suit (${T.SUIT_INFO[pick].name}) to run out of it and be able to trump later.`,
+          ? tr(`Probe your longest suit (${T.SUIT_INFO[pick].name}) with a low card.`, `Sondez votre couleur la plus longue (${sn(pick)}) avec une petite carte.`)
+          : tr(`Lead low in your shortest suit (${T.SUIT_INFO[pick].name}) to run out of it and be able to trump later.`, `Entamez petit dans votre couleur la plus courte (${sn(pick)}) pour vous en défaire et pouvoir couper plus tard.`),
       };
     }
     const lowTrump = trumps.filter(c => c.rank !== 1)[0] || trumps[0];
-    if (lowTrump) return { card: lowTrump, reason: 'Only trumps left: lead the lowest, keeping the Petit for the last trick.' };
-    return { card: excuse, reason: 'Nothing else to play.' };
+    if (lowTrump) return { card: lowTrump, reason: tr('Only trumps left: lead the lowest, keeping the Petit for the last trick.', 'Il ne reste que des atouts : jouez le plus petit en gardant le Petit pour le dernier pli.') };
+    return { card: excuse, reason: tr('Nothing else to play.', 'Rien d\'autre à jouer.') };
   }
 
   /** ctx: {hand, trick, player, taker, trickNo}. Returns {card, reason}. */
@@ -138,7 +141,7 @@
     const info = T.legalInfo(hand, trick);
     const legal = info.cards;
     if (legal.length === 1) {
-      return { card: legal[0], reason: legal[0].suit === 'X' ? 'The Excuse is your last card.' : 'Only one legal card.' };
+      return { card: legal[0], reason: legal[0].suit === 'X' ? tr('The Excuse is your last card.', 'L\'Excuse est votre dernière carte.') : tr('Only one legal card.', 'Une seule carte est permise.') };
     }
     const excuse = legal.find(c => c.suit === 'X');
     const playable = legal.filter(c => c.suit !== 'X');
@@ -157,11 +160,11 @@
         const feed = (pool.length ? pool : playable).slice().sort((a, b) => b.points - a.points || lowFirst(a, b))[0];
         return {
           card: feed,
-          reason: `Your partner is winning${last ? ' and nobody can overtake' : ' with the unbeatable 21'}: feed the trick with your most valuable safe card.`,
+          reason: tr(`Your partner is winning${last ? ' and nobody can overtake' : ' with the unbeatable 21'}: feed the trick with your most valuable safe card.`, `Votre partenaire gagne${last ? ' et personne ne peut le surpasser' : ' avec le 21 imbattable'} : chargez le pli avec votre carte la plus précieuse sans risque.`),
         };
       }
       const low = playable.slice().sort(lowFirst)[0];
-      return { card: low, reason: 'Your partner is winning for now: play low and keep your good cards.' };
+      return { card: low, reason: tr('Your partner is winning for now: play low and keep your good cards.', 'Votre partenaire gagne pour le moment : jouez petit et gardez vos bonnes cartes.') };
     }
 
     const winners = playable
@@ -173,15 +176,15 @@
       if (!(voluntaryTrump && trickPts < 3)) {
         return {
           card: cheapest,
-          reason: `An opponent is winning (${fmt(trickPts)} pts on the table). ${cheapest.name} is the cheapest card that takes the trick.`,
+          reason: tr(`An opponent is winning (${fmt(trickPts)} pts on the table). ${cheapest.name} is the cheapest card that takes the trick.`, `Un adversaire gagne (${fmt(trickPts)} pts sur la table). ${cheapest.name} est la carte la moins chère qui prend le pli.`),
         };
       }
     }
     const sacrifice = playable.slice().sort(lowFirst)[0];
     if (excuse && sacrifice.points >= 2.5) {
-      return { card: excuse, reason: `You cannot win this trick and would lose ${sacrifice.name}. The Excuse saves it.` };
+      return { card: excuse, reason: tr(`You cannot win this trick and would lose ${sacrifice.name}. The Excuse saves it.`, `Vous ne pouvez pas gagner ce pli et perdriez ${sacrifice.name}. L'Excuse la sauve.`) };
     }
-    return { card: sacrifice, reason: 'You cannot win this trick: give away your least valuable card.' };
+    return { card: sacrifice, reason: tr('You cannot win this trick: give away your least valuable card.', 'Vous ne pouvez pas gagner ce pli : donnez votre carte la moins précieuse.') };
   }
 
   T.Bots = { evaluateHand, chooseBid, chooseDiscard, choosePlay, sameTeam, fmt };

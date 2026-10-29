@@ -3,6 +3,7 @@
   'use strict';
 
   const el = window.Core.el;
+  const tr = window.Core.t;
 
   /** Render one card. opts: {back, onclick, cls, mini} */
   function cardEl(card, opts) {
@@ -31,7 +32,7 @@
   const cardsRow = (cards, opts) => el('div', { class: 'cards-row' }, cards.map(c => cardEl(c, opts)));
 
   const fmt = T.Bots.fmt;
-  const contractName = k => (k ? T.CONTRACTS[k].name : 'Pass');
+  const contractName = k => (k ? T.CONTRACTS[k].name : tr('Pass', 'Passer'));
 
   /** Persisted settings */
   const Settings = {
@@ -51,7 +52,7 @@
       const cards = T.DECK.filter(c => c.suit === s);
       wrap.append(el('div', { class: 'deck-group' },
         el('h4', {}, `${T.SUIT_INFO[s].sym} ${T.SUIT_INFO[s].name} `,
-          el('small', {}, s === 'T' ? '21 cards (1–21)' : s === 'X' ? '1 card' : '14 cards: 1–10 + J, C, Q, K')),
+          el('small', {}, s === 'T' ? tr('21 cards (1–21)', '21 cartes (1–21)') : s === 'X' ? tr('1 card', '1 carte') : tr('14 cards: 1–10 + J, C, Q, K', '14 cartes : 1–10 + V, C, D, R'))),
         cardsRow(cards)));
     });
     return wrap;
