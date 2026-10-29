@@ -254,3 +254,17 @@ a.btn { text-decoration: none; display: inline-block; }
 .table.escoba .backs { --cw: 34px; display: flex; justify-content: center; margin: 6px 0; }
 .table.escoba .backs .card { margin: 0 -8px; }
 .board.spanish-table { --cw: clamp(50px, 6vw, 68px); }
+
+/* Chinchón */
+.table.chinchon .seat .stack { font-size: .85rem; color: var(--gold-soft); }
+.table.chinchon .backs { display: flex; justify-content: center; margin: 6px 0; --cw: 26px; flex-wrap: wrap; max-width: 220px; margin-left: auto; margin-right: auto; }
+.table.chinchon .backs .card { margin: 0 -6px; }
+.row-piles { display: flex; gap: 28px; justify-content: center; align-items: flex-end; }
+.pile { text-align: center; }
+.groups { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.group { border: 2px solid rgba(255,255,255,.35); border-radius: 10px; padding: 3px 6px 6px; background: rgba(255,255,255,.07); }
+.group.loose { border-style: dashed; }
+.group .cap { font-size: .72rem; color: #cfe; text-align: center; }
+.group .hand { min-height: 0; padding: 0; }
+.table.chinchon .actions .hand.flat { justify-content: center; }
+.table select { font: inherit; padding: 2px; }

@@ -8,7 +8,6 @@
 
   const COMING = [
     ['🂡', 'Rami', 'Rummy-style: form sets and runs, then go out.'],
-    ['🎴', 'Chinchón', 'Spanish rummy with the 40-card deck.'],
     ['🇪🇸', 'El Tute', 'Spanish trick-taking game with the 40-card deck.'],
   ];
 
