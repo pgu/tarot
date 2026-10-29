@@ -4,10 +4,10 @@
 
   const SUITS = ['O', 'C', 'E', 'B'];
   const SUIT_INFO = {
-    O: { name: 'Oros', en: 'Coins', sym: '🪙', cls: 'sp-O' },
-    C: { name: 'Copas', en: 'Cups', sym: '🏆', cls: 'sp-C' },
+    O: { name: 'Oros', en: 'Coins', sym: '🟡', cls: 'sp-O' },
+    C: { name: 'Copas', en: 'Cups', sym: '🍷', cls: 'sp-C' },
     E: { name: 'Espadas', en: 'Swords', sym: '⚔️', cls: 'sp-E' },
-    B: { name: 'Bastos', en: 'Clubs', sym: '🌿', cls: 'sp-B' },
+    B: { name: 'Bastos', en: 'Clubs', sym: '🪵', cls: 'sp-B' },
   };
   const RANKS = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
   const LABEL = { 1: 'A', 10: 'S', 11: 'C', 12: 'R' };

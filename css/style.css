@@ -237,7 +237,15 @@ a.btn { text-decoration: none; display: inline-block; }
 .card.sp-C { background: linear-gradient(160deg, #fff, #fadada); color: #a8201a; border-color: #b05a56; }
 .card.sp-E { background: linear-gradient(160deg, #fff, #dbe6f7); color: #1f4a8a; border-color: #5a7ab0; }
 .card.sp-B { background: linear-gradient(160deg, #fff, #dcefd9); color: #1f6b2e; border-color: #5a9a66; }
-.card.spanish .badge.sp-small { background: none; color: inherit; font-size: .9em; right: 4px; bottom: 2px; padding: 0; }
+.suit-icon { display: inline-block; line-height: 0; }
+.suit-icon svg { width: 1em; height: 1em; vertical-align: -.12em; }
+.card.spanish .corner { font-size: 1em; }
+.card.spanish .corner .suit-icon svg { width: 1.05em; height: 1.05em; }
+.card.spanish .center { flex-direction: column; font-size: 1.9em; line-height: 1; }
+.card.spanish .center .suit-icon svg { width: 1.4em; height: 1.4em; }
+.card.spanish .center.face .fl { font-size: 1.05em; font-weight: 800; }
+.card.spanish .center.face .fn { font-size: .5em; font-weight: 600; opacity: .75; margin-top: .1em; }
+.card.spanish .badge.sp-small { background: rgba(0,0,0,.65); color: #fff; font-size: .6em; right: 3px; bottom: 3px; padding: 0 5px; border-radius: 99px; }
 .card.spanish .center { font-family: Georgia, serif; }
 .card.capture { box-shadow: 0 0 0 3px #1e9c55; }
 .card.chosen { transform: translateY(-12px); box-shadow: 0 0 0 4px #2a6df4; }

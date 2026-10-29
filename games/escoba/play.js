@@ -79,7 +79,7 @@
       const p = game.piles[1];
       return el('div', { class: 'seat north' }, el('div', { class: 'name' }, 'Bot ', game.turn === 1 && game.phase === 'play' ? el('span', { class: 'chip turn' }, 'thinking…') : null),
         el('div', { class: 'backs' }, game.hands[1].map(() => cardEl(null, { back: true }))),
-        el('div', { class: 'muted', style: 'color:#cfe' }, `Captured: ${p.length} cards · ${p.filter(c => c.suit === 'O').length} coins · ${game.escobas[1]} escoba(s)`));
+        el('div', { class: 'muted', style: 'color:#cfe' }, `Captured: ${p.length} cards · ${p.filter(c => c.suit === 'O').length} oros · ${game.escobas[1]} escoba(s)`));
     }
 
     function tableArea() {
@@ -151,7 +151,7 @@
       tableEl.innerHTML = '';
       tableEl.append(oppPanel(), tableArea(), el('div', { class: 'actions' }, controls(),
         el('div', { class: 'seat south' }, el('div', { class: 'name' }, 'You ', game.turn === 0 && game.phase === 'play' ? el('span', { class: 'chip turn' }, 'your turn') : null),
-          el('div', { class: 'muted', style: 'color:#cfe' }, `Captured: ${game.piles[0].length} cards · ${game.piles[0].filter(c => c.suit === 'O').length} coins · ${game.escobas[0]} escoba(s)`)),
+          el('div', { class: 'muted', style: 'color:#cfe' }, `Captured: ${game.piles[0].length} cards · ${game.piles[0].filter(c => c.suit === 'O').length} oros · ${game.escobas[0]} escoba(s)`)),
         handEl()));
       sideEl.innerHTML = '';
       sideEl.append(scorePanel(), coachPanel(), settingsPanel(), logPanel());

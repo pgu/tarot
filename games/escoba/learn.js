@@ -21,7 +21,7 @@
           <ul>
             <li><strong>Sota</strong> (Jack, number 10)</li><li><strong>Caballo</strong> (Knight, number 11)</li><li><strong>Rey</strong> (King, number 12)</li>
           </ul>
-          <p>The suits are <strong>Oros</strong> (coins 🪙), <strong>Copas</strong> (cups 🏆), <strong>Espadas</strong> (swords ⚔️) and <strong>Bastos</strong> (clubs 🌿). In this site: A = As (ace), S = Sota, C = Caballo, R = Rey.</p>
+          <p>The suits are <strong>Oros</strong> (monedas 🟡), <strong>Copas</strong> (copas 🍷), <strong>Espadas</strong> (espadas ⚔️) and <strong>Bastos</strong> (bastos 🪵). On the cards: the number is in the corner (1 = As, 10 = Sota, 11 = Caballo, 12 = Rey), and the figures also show their letter: <strong>S</strong>ota, <strong>C</strong>aballo, <strong>R</strong>ey. The small grey tag on a figure (=8, =9, =10) is its value in Escoba.</p>
           <h3>Values in Escoba</h3>
           <table class="t"><tr><th>Card</th><th>As–7</th><th>Sota</th><th>Caballo</th><th>Rey</th></tr><tr><th>Value</th><td>1 to 7 as printed</td><td>8</td><td>9</td><td>10</td></tr></table>` });
         d.append(S.deckGuide());
