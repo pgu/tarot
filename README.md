@@ -13,6 +13,9 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 | **El Tute** (tute arrastrado, 2 players) | available |
 | **Le Rami** (2–4 players, 108 cards) | available · French only |
 | **El Mus** (2 couples, mus a 8 reyes) | available |
+| **La Brisca** (2 players) | available |
+| **El Cinquillo** (3–4 players, classic rule) | available |
+| La Podrida, El Julepe | planned |
 
 Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
 
@@ -32,6 +35,8 @@ node test/escoba.sim.js 300   # bot-only Escoba games: all 40 cards end up in pi
 node test/chinchon.sim.js 200 # bot-only Chinchón games (2-4 players): meld rules, closing, 40 cards conserved
 node test/tute.sim.js 500     # bot-only Tute hands: trick rules, 120 card points, cantes, 40 cards conserved
 node test/mus.sim.js 100      # Mus rules (grande, chica, pares, juego) + bot-only games to 40 piedras
+node test/brisca.sim.js 500   # bot-only Brisca hands: 120 points, 40 cards conserved
+node test/cinquillo.sim.js 200 # bot-only Cinquillo games (3-4 players): every round ends, cards conserved
 node test/rami.eval.js        # Rami combination rules (sets, runs, jokers, ace, arrangement search)
 node test/rami.sim.js 12      # bot-only Rami games: 108 cards conserved, every round ends
 ```
@@ -56,6 +61,8 @@ Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
 - **Tarot:** no Poignée, Chelem or 3/5-player variants; automatic Excuse exchange.
+- **Brisca:** 2 players only, no "cambiar el siete". Reuses the Tute card order, points and trick AI (games/tute).
+- **Cinquillo:** 3-4 players, passing only when no card is playable (free), scoring = cards left in the others' hands, to 30.
 - **Mus:** mus a 8 reyes, one game to 40 piedras (no vacas), bets of 2 or 5 plus órdago, no señas (your partner is a bot).
 - **Rami:** opening at 51 + a pure suite; at most one joker per combination; unopened players count a flat 100 penalty; fixed number of rounds.
 - **Tute:** 2-player tute arrastrado only; no swap of the 2 of triumph; no obligation to lead from a sung pair.
