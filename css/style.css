@@ -328,3 +328,11 @@ a.btn { text-decoration: none; display: inline-block; }
 .drill .cinq-board .cinq-slot { border-color: rgba(0,0,0,.2); color: rgba(0,0,0,.35); }
 .drill .cinq-board { background: #1d5a42; border-radius: 10px; padding: 8px; margin: 8px 0; }
 .drill .cinq-board .cinq-label { color: #fff; }
+
+/* El Siete y medio */
+.table.sietemedio { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.table.sietemedio .pcards.sm { display: flex; justify-content: center; gap: 4px; margin: 6px 0; --cw: 42px; flex-wrap: wrap; }
+
+/* La Podrida */
+.table.podrida { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.table.podrida .slot .card { display: block; margin: 0 auto 2px; }
