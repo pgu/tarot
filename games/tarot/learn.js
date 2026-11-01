@@ -222,7 +222,7 @@
             Difference: ${pts} − ${need} = <strong>+${diff}</strong>. Score: (25 + ${diff}) × ${mult} = <strong>${per}</strong>.
             The taker gets <strong>+${per * 3}</strong>, each defender gets <strong>−${per}</strong>.</div>
           <p><strong>Petit au bout</strong> (“Petit at the end”): if the Petit (trump 1) is played in the <em>last</em> trick and its camp wins that trick, that camp gets a bonus of <strong>10 points × the multiplier</strong>. Risky but rewarding: protect your Petit until the very end!</p>
-          <p class="muted">Not in this first version: <em>Poignée</em> (announcing a big trump hand), <em>Chelem</em> (winning all tricks), the 5-player variant. (With 3 players the taker scores twice instead of three times.)</p>`, `
+          <p class="muted">Bonuses (<em>Poignée</em>) are explained in the next lesson. Not implemented: <em>Chelem</em> (winning all tricks) and the 5-player variant. (With 3 players the taker scores twice instead of three times.)</p>`, `
           <p>Quand tous les plis sont joués (18, ou 24 à 3 joueurs), chaque camp compte les points des cartes qu'il a remportées (le preneur y ajoute les cartes de l'écart).</p>
           <ol>
             <li>Comptez les <strong>bouts</strong> du preneur pour connaître le nombre de points à faire.</li>
@@ -234,8 +234,40 @@
             Différence : ${pts} − ${need} = <strong>+${diff}</strong>. Score : (25 + ${diff}) × ${mult} = <strong>${per}</strong>.
             Le preneur marque <strong>+${per * 3}</strong>, chaque défenseur marque <strong>−${per}</strong>.</div>
           <p><strong>Petit au bout</strong> : si le Petit (1 d'atout) est joué au <em>dernier</em> pli et que son camp remporte ce pli, ce camp reçoit une prime de <strong>10 points × le multiplicateur</strong>. Risqué mais rémunérateur : protégez votre Petit jusqu'à la toute fin !</p>
-          <p class="muted">Pas dans cette première version : la <em>poignée</em> (annoncer une grosse main d'atouts), le <em>chelem</em> (remporter tous les plis), la variante à 5 joueurs. (À 3 joueurs, le preneur marque deux fois au lieu de trois.)</p>`) });
+          <p class="muted">Les primes (<em>poignée</em>) sont expliquées dans la leçon suivante. Non implémentés : le <em>chelem</em> (remporter tous les plis) et la variante à 5 joueurs. (À 3 joueurs, le preneur marque deux fois au lieu de trois.)</p>`) });
       },
+    },
+    {
+      title: () => tr('Bonuses: the Poignée', 'Les primes : la poignée'),
+      body: () => el('div', { html: tr(`
+        <p>A <strong>Poignée</strong> (“handful”) rewards a hand packed with trumps. Before playing your <strong>first card</strong> of the deal, you may <strong>show</strong> a number of trumps to everybody:</p>
+        <table class="t"><tr><th>Poignée</th><th>Bonus</th><th>Trumps (4 players)</th><th>Trumps (3 players)</th></tr>
+          <tr><td>Single</td><td>20</td><td>10</td><td>13</td></tr>
+          <tr><td>Double</td><td>30</td><td>13</td><td>15</td></tr>
+          <tr><td>Triple</td><td>40</td><td>15</td><td>18</td></tr></table>
+        <ul>
+          <li>With 3 players everybody has 24 cards, so you need more trumps.</li>
+          <li>Anybody can announce one: the taker <em>or</em> a defender. It is shown only once per player and per deal.</li>
+          <li>You show exactly the required number, even if you hold more (14 trumps in a 4-player game: you show 13, a Double).</li>
+          <li>The <strong>Excuse</strong> may count as a trump only if it is the one missing trump, i.e. you have no other trump left to show.</li>
+          <li>The bonus goes to the <strong>camp that wins the deal</strong>, whoever announced it. It is <strong>not multiplied</strong> by the contract.</li>
+        </ul>
+        <div class="note"><strong>Example.</strong> A defender shows a Double Poignée (+30). If the taker fails, the defenders get the 30 bonus on top of their score; if the taker makes the contract, the taker's camp gets it instead. With 4 players the taker collects the bonus from each of the 3 defenders (×3); with 3 players, from each of the 2 (×2).</div>
+        <p>In <a href="#/tarot/play">Play</a>, buttons appear when it is your turn to lead off with enough trumps. The bots announce theirs automatically, and the shown trumps are listed in the side panel.</p>`, `
+        <p>Une <strong>poignée</strong> récompense une main remplie d'atouts. Avant de jouer votre <strong>première carte</strong> de la donne, vous pouvez <strong>montrer</strong> un certain nombre d'atouts à tout le monde :</p>
+        <table class="t"><tr><th>Poignée</th><th>Prime</th><th>Atouts (4 joueurs)</th><th>Atouts (3 joueurs)</th></tr>
+          <tr><td>Simple</td><td>20</td><td>10</td><td>13</td></tr>
+          <tr><td>Double</td><td>30</td><td>13</td><td>15</td></tr>
+          <tr><td>Triple</td><td>40</td><td>15</td><td>18</td></tr></table>
+        <ul>
+          <li>À 3 joueurs, chacun a 24 cartes : il faut donc plus d'atouts.</li>
+          <li>Chacun peut en annoncer une : le preneur <em>ou</em> un défenseur. Une seule fois par joueur et par donne.</li>
+          <li>Vous montrez exactement le nombre requis, même si vous en avez plus (14 atouts à 4 joueurs : vous en montrez 13, une double).</li>
+          <li>L'<strong>Excuse</strong> ne compte comme atout que si c'est le seul atout manquant, c'est-à-dire si vous n'avez plus d'autre atout à montrer.</li>
+          <li>La prime revient au <strong>camp qui remporte la donne</strong>, quel que soit celui qui l'a annoncée. Elle <strong>n'est pas multipliée</strong> par le contrat.</li>
+        </ul>
+        <div class="note"><strong>Exemple.</strong> Un défenseur montre une poignée double (+30). Si le preneur chute, les défenseurs touchent les 30 en plus de leur score ; si le preneur remplit son contrat, c'est son camp qui touche la prime. À 4 joueurs, le preneur la perçoit auprès de chacun des 3 défenseurs (×3) ; à 3 joueurs, auprès de chacun des 2 (×2).</div>
+        <p>Dans <a href="#/tarot/play">Jouer</a>, des boutons apparaissent quand c'est à vous d'entamer avec assez d'atouts. Les bots annoncent les leurs automatiquement, et les atouts montrés sont listés dans le panneau latéral.</p>`) }),
     },
     {
       title: () => tr('First strategy tips', 'Premiers conseils de stratégie'),
@@ -323,7 +355,7 @@
       ['Monde', 'Trump 21, the highest trump.'],
       ['Petit', 'Trump 1, the lowest trump (an oudler).'],
       ['Petit au bout', 'Petit played in the last trick by the camp that wins it: 10 point bonus × multiplier.'],
-      ['Poignée', 'Announcing 10+ trumps for a bonus (coming in a later version).'],
+      ['Poignée', 'Showing 10+ trumps (13+ with 3 players) before your first card for a 20 / 30 / 40 bonus.'],
       ['Chelem / Slam', 'Winning all 18 tricks (coming in a later version).'],
       ['Preneur / Taker', 'The highest bidder, who plays alone against the 3 defenders.'],
       ['Pli / Trick', 'One card from each player; one winner.'],
@@ -342,7 +374,7 @@
       ['Monde', 'Le 21 d\'atout, le plus fort des atouts.'],
       ['Petit', 'Le 1 d\'atout, le plus faible des atouts (un bout).'],
       ['Petit au bout', 'Le Petit joué au dernier pli par le camp qui remporte ce pli : prime de 10 points × multiplicateur.'],
-      ['Poignée', 'Annoncer 10 atouts ou plus pour toucher une prime (dans une prochaine version).'],
+      ['Poignée', 'Montrer 10 atouts ou plus (13 à 3 joueurs) avant sa première carte pour une prime de 20 / 30 / 40.'],
       ['Chelem', 'Remporter les 18 plis (dans une prochaine version).'],
       ['Preneur', 'Le meilleur enchérisseur, qui joue seul contre les 3 défenseurs.'],
       ['Pli', 'Une carte de chaque joueur ; un seul gagnant.'],
@@ -364,12 +396,12 @@
       el('table', { class: 't' }, gloss.map(([a, b]) => el('tr', {}, el('th', {}, a), el('td', {}, b)))),
       el('h3', {}, tr('Simplifications in this version', 'Simplifications de cette version')),
       el('ul', {}, tr([
-        '4- and 3-player games (no 5 players). No Poignée, no Chelem announcements.',
+        '4- and 3-player games (no 5 players). No Chelem announcements. Poignée: the Excuse only counts when it is the one missing trump, and you always show exactly the required number.',
         'The Excuse exchange is automatic: the camp that keeps the Excuse gives away 0.5 points instead of a specific card.',
         'If the Excuse is the first card of a trick, the next card played sets the suit.',
         'If everyone passes, the cards are simply re-dealt.',
       ], [
-        'Jeu à 4 et à 3 joueurs (pas à 5). Ni poignée, ni annonce de chelem.',
+        'Jeu à 4 et à 3 joueurs (pas à 5). Pas d\'annonce de chelem. Poignée : l\'Excuse ne compte que si c\'est le seul atout manquant, et on montre toujours exactement le nombre requis.',
         'L\'échange de l\'Excuse est automatique : le camp qui garde l\'Excuse cède 0,5 point au lieu d\'une carte précise.',
         'Si l\'Excuse est la première carte d\'un pli, la carte suivante détermine la couleur.',
         'Si tout le monde passe, les cartes sont simplement redistribuées.',

@@ -92,7 +92,24 @@
     return null;
   }
 
+  /* Poignée: showing a big set of trumps earns a bonus for the camp that wins the deal. */
+  const POIGNEE_MIN = { 4: [10, 13, 15], 3: [13, 15, 18] }; // trumps needed for simple / double / triple
+  const POIGNEE_POINTS = [20, 30, 40];
+  const poigneeName = level => tr(['Single', 'Double', 'Triple'], ['simple', 'double', 'triple'])[level - 1];
+
+  /** Trumps shown for a poignée of `level`, or null if the hand cannot make it.
+   *  The Excuse only stands in for a trump when it is the one missing trump (no other trump left to show). */
+  function poigneeCards(hand, level, players) {
+    const n = POIGNEE_MIN[players][level - 1];
+    const trumps = hand.filter(c => c.suit === 'T');
+    if (trumps.length >= n) return trumps.slice().sort((a, b) => (a.oudler - b.oudler) || (a.rank - b.rank)).slice(0, n);
+    const excuse = hand.find(c => c.suit === 'X');
+    if (excuse && trumps.length === n - 1) return trumps.concat(excuse);
+    return null;
+  }
+
   Object.assign(T, {
+    POIGNEE_MIN, POIGNEE_POINTS, poigneeName, poigneeCards,
     CONTRACTS, CONTRACT_ORDER, RULE_TEXT,
     leadSuit, legalInfo, legalCards, trickWinnerIndex, requiredPoints, validateDiscard,
   });

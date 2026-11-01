@@ -46,6 +46,9 @@
         const trumps = ev.cards.filter(c => c.suit === 'T');
         log(tr(`${n} discards 6 cards` + (trumps.length ? ` (including trumps: ${trumps.map(c => c.rank).join(', ')})` : '') + '.',
           `${n} ${you ? 'écartez' : 'écarte'} 6 cartes` + (trumps.length ? ` (dont des atouts : ${trumps.map(c => c.rank).join(', ')})` : '') + '.'), why);
+      } else if (ev.kind === 'poignee') {
+        log(tr(`${n} ${you ? 'announce' : 'announces'} a ${T.poigneeName(ev.level)} Poignée (${ev.cards.length} trumps, +${ev.points}).`,
+          `${n} ${you ? 'annoncez' : 'annonce'} une poignée ${T.poigneeName(ev.level)} (${ev.cards.length} atouts, +${ev.points}).`), why);
       } else if (ev.kind === 'play') log(tr(`${n} plays ${ev.card.text}.`, `${n} ${you ? 'jouez' : 'joue'} ${ev.card.text}.`), why);
     }
 
@@ -119,6 +122,12 @@
       hint = null;
       game.play(0, card);
       log(tr(`You play ${card.text}.`, `Vous jouez ${card.text}.`));
+      advance();
+    }
+
+    function humanPoignee(level) {
+      const rec = game.announcePoignee(0, level);
+      logEvent({ kind: 'poignee', player: 0, level: rec.level, points: rec.points, cards: rec.cards });
       advance();
     }
 
@@ -227,6 +236,9 @@
         const err = selected.size === 6 ? T.validateDiscard(g.hands[0], g.hands[0].filter(c => selected.has(c.id))) : 'x';
         box.append(el('button', { class: 'btn primary', disabled: !!err, onclick: confirmDiscard }, tr('Discard these 6 cards', 'Écarter ces 6 cartes')));
         if (settings.hints) box.append(el('button', { class: 'btn', onclick: suggestDiscard }, tr('💡 Suggest discards', '💡 Suggérer un écart')));
+      } else if (g.phase === 'play' && g.turn === 0 && g.poigneeOptions(0).length) {
+        g.poigneeOptions(0).forEach(o => box.append(el('button', { class: 'btn', title: tr('Show these trumps to everybody before playing your first card.', 'Montrez ces atouts à tout le monde avant de jouer votre première carte.'), onclick: () => humanPoignee(o.level) },
+          tr(`Announce a ${T.poigneeName(o.level)} Poignée (${o.count} trumps, +${o.points})`, `Annoncer une poignée ${T.poigneeName(o.level)} (${o.count} atouts, +${o.points})`))));
       } else if (g.phase === 'passed' || g.phase === 'done') {
         box.append(el('button', { class: 'btn primary', onclick: newDeal }, g.phase === 'done' ? tr('Next deal', 'Donne suivante') : tr('Deal again', 'Redonner')));
       }
@@ -271,6 +283,7 @@
           hint && hint.reason ? el('div', { class: 'coach-box' }, hint.reason) : null);
       } else if (g.phase === 'play' && g.turn === 0) {
         const info = g.legalFor(0);
+        if (g.poigneeOptions(0).length) box.append(el('div', { class: 'coach-box' }, tr('You hold enough trumps to announce a Poignée: a bonus for your camp if it wins the deal. You must announce it before your first card.', 'Vous avez assez d\'atouts pour annoncer une poignée : une prime pour votre camp s\'il gagne la donne. Il faut l\'annoncer avant votre première carte.')));
         box.append(el('p', {}, el('strong', {}, tr('Rule: ', 'Règle : ')), T.RULE_TEXT[info.rule]),
           el('button', { class: 'btn small', onclick: showHint }, tr('💡 Suggest a card', '💡 Suggérer une carte')),
           hint && hint.card ? el('div', { class: 'coach-box' }, el('strong', {}, hint.card.text), ' – ', hint.reason) : null);
@@ -297,6 +310,14 @@
       } else rows.push([tr('Phase', 'Phase'), tr('Bidding', 'Enchères')]);
       box.append(el('table', { class: 'score-pill' }, rows.map(r => el('tr', {}, el('td', { class: 'muted' }, r[0] + ' '), el('td', {}, r[1])))));
       return box;
+    }
+
+    function poigneePanel() {
+      if (!game.poignees.length) return null;
+      return el('div', { class: 'panel' }, el('h3', {}, tr('Poignée', 'Poignée')), game.poignees.map(p =>
+        el('div', { style: 'margin-bottom:8px' },
+          el('div', {}, el('strong', {}, NAMES[p.player]), ' · ', tr(`${T.poigneeName(p.level)} (${p.cards.length} trumps, +${p.points})`, `${T.poigneeName(p.level)} (${p.cards.length} atouts, +${p.points})`)),
+          el('div', { style: '--cw:26px;display:flex;flex-wrap:wrap;gap:2px;margin-top:4px' }, p.cards.map(c => cardEl(c))))));
     }
 
     function settingsPanel() {
@@ -335,7 +356,7 @@
       tableEl.append(seat(2), seat(3), centerArea(), seat(1),
         el('div', { class: 'actions' }, southActions(), seat(0), handEl()));
       sideEl.innerHTML = '';
-      sideEl.append(infoPanel(), coachPanel(), settingsPanel(), scorePanel(), logPanel());
+      sideEl.append(infoPanel(), poigneePanel(), coachPanel(), settingsPanel(), scorePanel(), logPanel());
     }
 
     function showResult() {
@@ -345,6 +366,7 @@
       const takerName = NAMES[r.taker];
       const close = () => { modalHost.innerHTML = ''; modalOpen = false; };
       const formula = `(25 + ${r.gap})${r.petit ? (r.petit > 0 ? ' + 10' : ' − 10') + ' (Petit au bout)' : ''}`;
+      const poigneeText = r.poignee ? ` ${r.poignee > 0 ? '+' : '−'} ${Math.abs(r.poignee)} (${tr('Poignée', 'poignée')})` : '';
       const takerYou = r.taker === 0;
       modalOpen = true;
       modalHost.append(el('div', { class: 'modal-back' }, el('div', { class: 'modal' },
@@ -356,7 +378,7 @@
           el('tr', {}, el('th', {}, tr('Taker\'s oudlers', 'Bouts du preneur')), el('td', {}, tr(`${r.oudlers} → needs ${r.required} points`, `${r.oudlers} → ${r.required} points requis`))),
           el('tr', {}, el('th', {}, tr('Taker\'s points', 'Points du preneur')), el('td', {}, tr(`${fmt(r.takerPoints)} (defenders ${fmt(r.defPoints)})`, `${fmt(r.takerPoints)} (défenseurs ${fmt(r.defPoints)})`))),
           el('tr', {}, el('th', {}, tr('Difference', 'Différence')), el('td', {}, tr(`${r.diff >= 0 ? '+' : ''}${fmt(r.diff)} → rounded ${r.gap}`, `${r.diff >= 0 ? '+' : ''}${fmt(r.diff)} → arrondi à ${r.gap}`))),
-          el('tr', {}, el('th', {}, tr('Score', 'Score')), el('td', {}, `${r.win ? '' : '−'}${formula} × ${r.mult} = ${r.perDefender >= 0 ? '+' : ''}${r.perDefender}`))),
+          el('tr', {}, el('th', {}, tr('Score', 'Score')), el('td', {}, `${r.win ? '' : '−'}${formula} × ${r.mult}${poigneeText} = ${r.perDefender >= 0 ? '+' : ''}${r.perDefender}`))),
         el('p', {}, tr(`The taker gets ${fmt(r.perDefender * (N - 1))}, each defender gets ${fmt(-r.perDefender)}. `, `Le preneur marque ${fmt(r.perDefender * (N - 1))}, chaque défenseur marque ${fmt(-r.perDefender)}. `),
           el('strong', {}, tr(`Your result: ${me > 0 ? '+' : ''}${me}`, `Votre résultat : ${me > 0 ? '+' : ''}${me}`))),
         el('div', { class: 'btn-row' },

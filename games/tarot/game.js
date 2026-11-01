@@ -29,6 +29,8 @@
       this.trick = [];
       this.trickNo = 0;
       this.history = [];
+      this.poignees = [];
+      this.poigneeChecked = new Set();
       this.leader = null;
       this.turn = null;
       this.piles = { taker: [], def: [] };
@@ -105,6 +107,26 @@
       this.turn = this.trick.length === this.players ? null : (player + 1) % this.players;
     }
 
+    /** Poignées `player` may announce now (only before playing the first card of the deal). */
+    poigneeOptions(player) {
+      if (this.phase !== 'play' || this.turn !== player) return [];
+      if (this.hands[player].length !== this.totalTricks || this.poignees.some(p => p.player === player)) return [];
+      const out = [];
+      for (let level = 1; level <= 3; level++) {
+        const cards = T.poigneeCards(this.hands[player], level, this.players);
+        if (cards) out.push({ level, points: T.POIGNEE_POINTS[level - 1], count: cards.length, cards: T.sortHand(cards) });
+      }
+      return out;
+    }
+
+    announcePoignee(player, level) {
+      const opt = this.poigneeOptions(player).find(o => o.level === level);
+      if (!opt) throw new Error(tr('You cannot announce this Poignée', 'Vous ne pouvez pas annoncer cette poignée.'));
+      const rec = { player, level, points: opt.points, cards: opt.cards, trickNo: this.trickNo };
+      this.poignees.push(rec);
+      return rec;
+    }
+
     get trickComplete() { return this.trick.length === this.players; }
 
     collectTrick() {
@@ -163,12 +185,15 @@
       const gap = Math.ceil(Math.abs(diff));
       const petit = this.petitAuBout ? (this.petitAuBout === 'taker' ? 10 : -10) : 0;
       const base = (win ? 1 : -1) * (25 + gap);
-      const perDefender = (base + petit) * mult;
+      // Poignée bonuses are not multiplied; they go to the camp that wins the deal.
+      const poigneeTotal = this.poignees.reduce((s, p) => s + p.points, 0);
+      const poignee = (win ? 1 : -1) * poigneeTotal;
+      const perDefender = (base + petit) * mult + poignee;
       const totals = [...Array(this.players).keys()].map(p => (p === this.taker ? perDefender * (this.players - 1) : -perDefender));
       return {
         taker: this.taker, contract: this.contract, takerPoints, defPoints: 91 - takerPoints,
         oudlers, required, diff, win, gap, mult, base, petit, perDefender, totals,
-        petitAuBout: this.petitAuBout || null, players: this.players,
+        petitAuBout: this.petitAuBout || null, players: this.players, poignees: this.poignees.slice(), poignee,
       };
     }
 
@@ -194,6 +219,19 @@
       }
       if (this.phase === 'play' && this.turn != null) {
         const p = this.turn;
+        if (!this.poigneeChecked.has(p)) {
+          this.poigneeChecked.add(p);
+          const opts = this.poigneeOptions(p);
+          if (opts.length) {
+            const o = opts[opts.length - 1]; // bots always show their biggest poignée
+            const rec = this.announcePoignee(p, o.level);
+            return {
+              kind: 'poignee', player: p, level: rec.level, points: rec.points, cards: rec.cards,
+              reason: tr(`${rec.cards.length} trumps in hand: enough for a ${T.poigneeName(rec.level)} Poignée (+${rec.points} for the winning camp).`,
+                `${rec.cards.length} atouts en main : assez pour une poignée ${T.poigneeName(rec.level)} (+${rec.points} pour le camp gagnant).`),
+            };
+          }
+        }
         const r = this.suggest(p);
         this.play(p, r.card);
         return { kind: 'play', player: p, card: r.card, reason: r.reason };
