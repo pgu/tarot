@@ -36,7 +36,7 @@
 
   /** Persisted settings */
   const Settings = {
-    defaults: { highlight: true, hints: true, explain: true, count: false },
+    defaults: { highlight: true, hints: true, explain: true, count: false, players: 4 },
     get() {
       try { return Object.assign({}, this.defaults, JSON.parse(localStorage.getItem('tarot.settings') || '{}')); }
       catch (e) { return Object.assign({}, this.defaults); }

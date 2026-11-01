@@ -18,6 +18,7 @@
           <li>The deal is played in <strong>18 tricks</strong>. In each trick every player plays one card; the best card wins it.</li>
           <li>Won cards are worth points. The taker must collect <strong>enough points</strong> to fulfil their contract.</li>
         </ul>
+        <div class="note"><strong>3 players?</strong> Switch to 3 players in the <a href="#/tarot/play">Play</a> screen. Each player then gets <strong>24 cards</strong> (the dog is still 6), the deal has <strong>24 tricks</strong>, and the taker plays against <strong>2 defenders</strong>. Everything else (bidding, oudlers, points needed) is identical. The taker scores the result <strong>twice</strong> (once per defender).</div>
         <div class="note">Don't worry about memorising everything. The next lessons go one step at a time, with small exercises, and in the <a href="#/tarot/play">Play</a> mode a coach can highlight legal cards and suggest moves.</div>`, `
         <p>Ce site vous enseigne le <strong>Tarot français</strong>, le jeu de cartes qui se joue avec un jeu de tarot de 78 cartes.
         C'est un <strong>jeu de levées</strong> (de plis), un peu comme le Bridge ou la Belote. Nous utilisons ici la version classique <strong>à 4 joueurs</strong>.</p>
@@ -28,6 +29,7 @@
           <li>La donne se joue en <strong>18 plis</strong>. À chaque pli, chaque joueur pose une carte ; la meilleure carte remporte le pli.</li>
           <li>Les cartes gagnées valent des points. Le preneur doit récolter <strong>assez de points</strong> pour remplir son contrat.</li>
         </ul>
+        <div class="note"><strong>À 3 joueurs ?</strong> Passez à 3 joueurs dans l'écran <a href="#/tarot/play">Jouer</a>. Chaque joueur reçoit alors <strong>24 cartes</strong> (le chien reste de 6), la donne compte <strong>24 plis</strong> et le preneur affronte <strong>2 défenseurs</strong>. Tout le reste (enchères, bouts, points à faire) est identique. Le preneur marque le résultat <strong>deux fois</strong> (une fois par défenseur).</div>
         <div class="note">Pas d'inquiétude : inutile de tout retenir d'un coup. Les leçons suivantes avancent pas à pas, avec de petits exercices, et dans le mode <a href="#/tarot/play">Jouer</a> un coach peut surligner les cartes jouables et suggérer des coups.</div>`) }),
     },
     {
@@ -63,6 +65,7 @@
             <tr><td>Knight (Cavalier)</td><td>2.5</td></tr><tr><td>Jack (Valet)</td><td>1.5</td></tr>
             <tr><td>Each oudler (Excuse, Petit, 21)</td><td>4.5</td></tr>
             <tr><td>Every other card</td><td>0.5</td></tr></table>
+          <div class="note"><strong>Why 4.5 and not 5?</strong> You may see a King "worth 5". That is the quick table method: count a face card together with one 0.5-point card, so King + 0.5 = 5, Queen + 0.5 = 4, Knight + 0.5 = 3, Jack + 0.5 = 2 (and the same for an oudler: 4.5 + 0.5 = 5). Both methods give the same total of 91. This game counts card by card, so a King alone is 4.5.</div>
           <p>The more oudlers the taker holds at the end, the fewer points they need:</p>
           <table class="t"><tr><th>Oudlers</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
             <tr><td>Points needed</td><td>56</td><td>51</td><td>41</td><td>36</td></tr></table>
@@ -73,6 +76,7 @@
             <tr><td>Cavalier</td><td>2,5</td></tr><tr><td>Valet</td><td>1,5</td></tr>
             <tr><td>Chaque bout (Excuse, Petit, 21)</td><td>4,5</td></tr>
             <tr><td>Toutes les autres cartes</td><td>0,5</td></tr></table>
+          <div class="note"><strong>Pourquoi 4,5 et pas 5 ?</strong> Vous verrez parfois un roi « à 5 ». C'est la méthode rapide du comptage par paires : on compte une figure (ou un bout) avec une carte de 0,5 point, donc roi + 0,5 = 5, dame + 0,5 = 4, cavalier + 0,5 = 3, valet + 0,5 = 2 (et bout 4,5 + 0,5 = 5). Les deux méthodes donnent le même total de 91. Ici, on compte carte par carte : un roi seul vaut 4,5.</div>
           <p>Plus le preneur détient de bouts à la fin, moins il a besoin de points :</p>
           <table class="t"><tr><th>Bouts</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
             <tr><td>Points à faire</td><td>56</td><td>51</td><td>41</td><td>36</td></tr></table>
@@ -207,7 +211,7 @@
         const name = 'Garde', pts = 47, mult = 2;
         const need = 41, diff = pts - need, base = 25 + diff, per = base * mult;
         return el('div', { html: tr(`
-          <p>When all 18 tricks are played, each camp counts the points of the cards they won (the taker includes the dog discards).</p>
+          <p>When all the tricks are played (18, or 24 with 3 players), each camp counts the points of the cards they won (the taker includes the dog discards).</p>
           <ol>
             <li>Count the taker's <strong>oudlers</strong> to find the points needed.</li>
             <li>Compute the <strong>difference</strong> between the points made and the points needed (rounded up to a whole number).</li>
@@ -218,8 +222,8 @@
             Difference: ${pts} − ${need} = <strong>+${diff}</strong>. Score: (25 + ${diff}) × ${mult} = <strong>${per}</strong>.
             The taker gets <strong>+${per * 3}</strong>, each defender gets <strong>−${per}</strong>.</div>
           <p><strong>Petit au bout</strong> (“Petit at the end”): if the Petit (trump 1) is played in the <em>last</em> trick and its camp wins that trick, that camp gets a bonus of <strong>10 points × the multiplier</strong>. Risky but rewarding: protect your Petit until the very end!</p>
-          <p class="muted">Not in this first version: <em>Poignée</em> (announcing a big trump hand), <em>Chelem</em> (winning all tricks), 3- and 5-player variants.</p>`, `
-          <p>Quand les 18 plis sont joués, chaque camp compte les points des cartes qu'il a remportées (le preneur y ajoute les cartes de l'écart).</p>
+          <p class="muted">Not in this first version: <em>Poignée</em> (announcing a big trump hand), <em>Chelem</em> (winning all tricks), the 5-player variant. (With 3 players the taker scores twice instead of three times.)</p>`, `
+          <p>Quand tous les plis sont joués (18, ou 24 à 3 joueurs), chaque camp compte les points des cartes qu'il a remportées (le preneur y ajoute les cartes de l'écart).</p>
           <ol>
             <li>Comptez les <strong>bouts</strong> du preneur pour connaître le nombre de points à faire.</li>
             <li>Calculez la <strong>différence</strong> entre les points réalisés et les points à faire (arrondie à l'entier supérieur).</li>
@@ -230,7 +234,7 @@
             Différence : ${pts} − ${need} = <strong>+${diff}</strong>. Score : (25 + ${diff}) × ${mult} = <strong>${per}</strong>.
             Le preneur marque <strong>+${per * 3}</strong>, chaque défenseur marque <strong>−${per}</strong>.</div>
           <p><strong>Petit au bout</strong> : si le Petit (1 d'atout) est joué au <em>dernier</em> pli et que son camp remporte ce pli, ce camp reçoit une prime de <strong>10 points × le multiplicateur</strong>. Risqué mais rémunérateur : protégez votre Petit jusqu'à la toute fin !</p>
-          <p class="muted">Pas dans cette première version : la <em>poignée</em> (annoncer une grosse main d'atouts), le <em>chelem</em> (remporter tous les plis), les variantes à 3 et à 5 joueurs.</p>`) });
+          <p class="muted">Pas dans cette première version : la <em>poignée</em> (annoncer une grosse main d'atouts), le <em>chelem</em> (remporter tous les plis), la variante à 5 joueurs. (À 3 joueurs, le preneur marque deux fois au lieu de trois.)</p>`) });
       },
     },
     {
@@ -353,18 +357,18 @@
         el('tr', {}, el('th', {}, tr('Bid', 'Contrat')), el('th', {}, '×'), el('th', {}, tr('Dog', 'Chien'))),
         T.CONTRACT_ORDER.map(k => el('tr', {}, el('td', {}, T.CONTRACTS[k].name), el('td', {}, '×' + T.CONTRACTS[k].mult), el('td', {}, T.CONTRACTS[k].dog)))),
       el('p', {}, el('strong', {}, tr('Points needed: ', 'Points à faire : ')), tr('0 oudlers → 56 · 1 → 51 · 2 → 41 · 3 → 36.', '0 bout → 56 · 1 → 51 · 2 → 41 · 3 → 36.')),
-      el('p', {}, el('strong', {}, tr('Card values: ', 'Valeur des cartes : ')), tr('K 4.5 · Q 3.5 · C 2.5 · J 1.5 · oudlers 4.5 · others 0.5 (total 91).', 'R 4,5 · D 3,5 · C 2,5 · V 1,5 · bouts 4,5 · autres 0,5 (total 91).')),
-      el('p', {}, el('strong', {}, tr('Score: ', 'Score : ')), tr('(25 + |points − needed|) × multiplier, positive if made, negative if failed; ±10×multiplier for Petit au bout. The taker scores ×3, each defender scores the opposite.', '(25 + |points faits − points à faire|) × multiplicateur, positif si le contrat est rempli, négatif s\'il chute ; ±10 × multiplicateur pour le petit au bout. Le preneur marque ×3, chaque défenseur marque l\'opposé.')),
+      el('p', {}, el('strong', {}, tr('Card values: ', 'Valeur des cartes : ')), tr('K 4.5 · Q 3.5 · C 2.5 · J 1.5 · oudlers 4.5 · others 0.5 (total 91). Counting in pairs (face card + a 0.5 card), a King is "5".', 'R 4,5 · D 3,5 · C 2,5 · V 1,5 · bouts 4,5 · autres 0,5 (total 91). En comptant par paires (figure + une carte de 0,5), un roi vaut « 5 ».')),
+      el('p', {}, el('strong', {}, tr('Score: ', 'Score : ')), tr('(25 + |points − needed|) × multiplier, positive if made, negative if failed; ±10×multiplier for Petit au bout. The taker scores ×3 (×2 with 3 players), each defender scores the opposite.', '(25 + |points faits − points à faire|) × multiplicateur, positif si le contrat est rempli, négatif s\'il chute ; ±10 × multiplicateur pour le petit au bout. Le preneur marque ×3 (×2 à 3 joueurs), chaque défenseur marque l\'opposé.')),
       el('h3', {}, tr('Glossary', 'Lexique')),
       el('table', { class: 't' }, gloss.map(([a, b]) => el('tr', {}, el('th', {}, a), el('td', {}, b)))),
       el('h3', {}, tr('Simplifications in this version', 'Simplifications de cette version')),
       el('ul', {}, tr([
-        'Only the 4-player game. No Poignée, no Chelem announcements.',
+        '4- and 3-player games (no 5 players). No Poignée, no Chelem announcements.',
         'The Excuse exchange is automatic: the camp that keeps the Excuse gives away 0.5 points instead of a specific card.',
         'If the Excuse is the first card of a trick, the next card played sets the suit.',
         'If everyone passes, the cards are simply re-dealt.',
       ], [
-        'Seulement le jeu à 4 joueurs. Ni poignée, ni annonce de chelem.',
+        'Jeu à 4 et à 3 joueurs (pas à 5). Ni poignée, ni annonce de chelem.',
         'L\'échange de l\'Excuse est automatique : le camp qui garde l\'Excuse cède 0,5 point au lieu d\'une carte précise.',
         'Si l\'Excuse est la première carte d\'un pli, la carte suivante détermine la couleur.',
         'Si tout le monde passe, les cartes sont simplement redistribuées.',

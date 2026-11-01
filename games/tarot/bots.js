@@ -10,7 +10,9 @@
 
   /* ---------- Hand evaluation / bidding ---------- */
 
-  function evaluateHand(hand) {
+  /** `players` = 3 scales the score down: a 24-card hand holds a third more of everything than an 18-card one. */
+  function evaluateHand(hand, players) {
+    const k = players === 3 ? 0.75 : 1;
     const trumps = hand.filter(c => c.suit === 'T');
     const oudlers = hand.filter(c => c.oudler);
     const kings = hand.filter(c => isSuitCard(c) && c.rank === 14);
@@ -23,7 +25,7 @@
 
     const details = [];
     let score = 0;
-    const add = (label, value, note) => { if (value) { score += value; details.push({ label, value, note }); } };
+    const add = (label, value, note) => { if (value) { value *= k; score += value; details.push({ label, value, note }); } };
 
     add(tr(`${trumps.length} trump(s)`, `${trumps.length} atout(s)`), trumps.length, tr('Trumps win tricks and protect your kings. 1 point each.', 'Les atouts font gagner des plis et protègent vos rois. 1 point chacun.'));
     let oudlerValue = oudlers.length * 4;
@@ -50,8 +52,8 @@
 
   const levelOf = key => (key ? T.CONTRACTS[key].level : 0);
 
-  function chooseBid(hand, highest, aggr) {
-    const ev = evaluateHand(hand);
+  function chooseBid(hand, highest, aggr, players) {
+    const ev = evaluateHand(hand, players);
     // `aggr` nudges the thresholds so bots do not all behave identically.
     const adj = ev.score + (aggr || 0);
     let want = null;
@@ -152,7 +154,7 @@
     const wp = trick[win].player;
     const wc = trick[win].card;
     const trickPts = T.sumPoints(trick.map(p => p.card));
-    const last = trick.length === 3;
+    const last = trick.length === (ctx.players || 4) - 1;
 
     if (sameTeam(taker, wp, player)) {
       if (last || wc.id === 'T21') {

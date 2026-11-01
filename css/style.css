@@ -157,6 +157,7 @@ table.t th { background: #f6ecd0; }
 }
 .trick-grid .p0 { grid-area: s; } .trick-grid .p1 { grid-area: e; }
 .trick-grid .p2 { grid-area: n; } .trick-grid .p3 { grid-area: w; }
+.trick-grid.three .p2 { grid-area: w; }
 .trick-grid .empty { width: var(--cw); height: calc(var(--cw) * 1.55); border: 2px dashed rgba(255,255,255,.18); border-radius: 7px; }
 .msg { text-align: center; min-height: 3em; font-size: 1.02rem; }
 .actions { grid-area: south; }

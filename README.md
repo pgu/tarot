@@ -5,7 +5,7 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 ## Games
 | Game | Status |
 |---|---|
-| **French Tarot** (4 players, 78 cards) | available · EN / FR switch |
+| **French Tarot** (3 or 4 players, 78 cards) | available · EN / FR switch |
 | **Texas Hold'em** (no-limit, you + 3 bots) | available |
 | **5-Card Draw** (no-limit, you + 3 bots) | available |
 | **La Escoba** (2 players, Spanish deck) | available |
@@ -63,7 +63,7 @@ To add a game: create `games/<id>/`, build screens as `fn(root, params)`, call `
 Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
-- **Tarot:** no Poignée, Chelem or 3/5-player variants; automatic Excuse exchange.
+- **Tarot:** no Poignée, Chelem or 5-player variant (3 and 4 players supported); automatic Excuse exchange.
 - **Brisca:** 2 players only, no "cambiar el siete". Reuses the Tute card order, points and trick AI (games/tute).
 - **Cinquillo:** 3-4 players, passing only when no card is playable (free), scoring = cards left in the others' hands, to 30.
 - **Siete y medio:** no chips or bets: each duel won against the bank is 1 point (2 with a natural 7½); the bank rotates; to 12.

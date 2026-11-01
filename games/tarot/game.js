@@ -1,25 +1,27 @@
-/* Game state machine for one deal (4 players, 18 cards each, 6-card dog). No DOM here. */
+/* Game state machine for one deal (4 players x 18 cards or 3 players x 24 cards, 6-card dog). No DOM here. */
 (function (T) {
   'use strict';
 
   const tr = window.Core.t;
-  const TOTAL_TRICKS = 18;
 
   class Game {
     constructor(opts) {
       opts = opts || {};
-      this.dealer = opts.dealer == null ? 3 : opts.dealer;
+      this.players = opts.players === 3 ? 3 : 4;
+      this.totalTricks = this.players === 3 ? 24 : 18;
+      this.dealer = opts.dealer == null ? this.players - 1 : opts.dealer;
       this.aggr = opts.aggr || [0, 1, 0, -1];
       this.newDeal();
     }
 
     newDeal() {
       const deck = T.shuffle(T.DECK.slice());
-      this.hands = [0, 1, 2, 3].map(i => T.sortHand(deck.slice(i * 18, i * 18 + 18)));
-      this.dog = T.sortHand(deck.slice(72));
+      const size = this.totalTricks;
+      this.hands = [...Array(this.players).keys()].map(i => T.sortHand(deck.slice(i * size, (i + 1) * size)));
+      this.dog = T.sortHand(deck.slice(this.players * size));
       this.phase = 'bidding';
       this.bids = [];
-      this.bidder = (this.dealer + 1) % 4;
+      this.bidder = (this.dealer + 1) % this.players;
       this.highest = null;
       this.taker = null;
       this.contract = null;
@@ -50,8 +52,8 @@
         this.highest = { player, contract };
       }
       this.bids.push({ player, contract: contract || null });
-      if (this.bids.length === 4) this.endBidding();
-      else this.bidder = (this.bidder + 1) % 4;
+      if (this.bids.length === this.players) this.endBidding();
+      else this.bidder = (this.bidder + 1) % this.players;
     }
 
     endBidding() {
@@ -84,7 +86,7 @@
 
     startPlay() {
       this.phase = 'play';
-      this.leader = (this.dealer + 1) % 4;
+      this.leader = (this.dealer + 1) % this.players;
       this.turn = this.leader;
       this.trick = [];
       this.trickNo = 0;
@@ -100,17 +102,17 @@
       if (!this.legalFor(player).cards.includes(card)) throw new Error(tr('Illegal card', 'Carte interdite.'));
       this.hands[player] = this.hands[player].filter(c => c !== card);
       this.trick.push({ player, card });
-      this.turn = this.trick.length === 4 ? null : (player + 1) % 4;
+      this.turn = this.trick.length === this.players ? null : (player + 1) % this.players;
     }
 
-    get trickComplete() { return this.trick.length === 4; }
+    get trickComplete() { return this.trick.length === this.players; }
 
     collectTrick() {
       if (!this.trickComplete) throw new Error(tr('Trick not complete', 'Le pli n\'est pas terminé.'));
       const idx = T.trickWinnerIndex(this.trick);
       const winner = this.trick[idx].player;
       const winTeam = this.team(winner);
-      const last = this.trickNo === TOTAL_TRICKS - 1;
+      const last = this.trickNo === this.totalTricks - 1;
       let cards = this.trick.map(p => p.card);
 
       const ex = this.trick.find(p => p.card.suit === 'X');
@@ -135,7 +137,7 @@
 
       this.trickNo++;
       this.trick = [];
-      if (this.trickNo === TOTAL_TRICKS) {
+      if (this.trickNo === this.totalTricks) {
         this.phase = 'done';
         this.turn = null;
         this.result = this.computeResult();
@@ -162,11 +164,11 @@
       const petit = this.petitAuBout ? (this.petitAuBout === 'taker' ? 10 : -10) : 0;
       const base = (win ? 1 : -1) * (25 + gap);
       const perDefender = (base + petit) * mult;
-      const totals = [0, 0, 0, 0].map((_, p) => (p === this.taker ? perDefender * 3 : -perDefender));
+      const totals = [...Array(this.players).keys()].map(p => (p === this.taker ? perDefender * (this.players - 1) : -perDefender));
       return {
         taker: this.taker, contract: this.contract, takerPoints, defPoints: 91 - takerPoints,
         oudlers, required, diff, win, gap, mult, base, petit, perDefender, totals,
-        petitAuBout: this.petitAuBout || null,
+        petitAuBout: this.petitAuBout || null, players: this.players,
       };
     }
 
@@ -176,7 +178,7 @@
     botStep() {
       if (this.phase === 'bidding') {
         const p = this.bidder;
-        const r = T.Bots.chooseBid(this.hands[p], this.highest, this.aggr[p]);
+        const r = T.Bots.chooseBid(this.hands[p], this.highest, this.aggr[p], this.players);
         this.bid(p, r.contract);
         return { kind: 'bid', player: p, contract: r.contract, reason: r.reason };
       }
@@ -201,12 +203,12 @@
 
     suggest(player) {
       return T.Bots.choosePlay({
-        hand: this.hands[player], trick: this.trick, player, taker: this.taker, trickNo: this.trickNo,
+        hand: this.hands[player], trick: this.trick, player, taker: this.taker, trickNo: this.trickNo, players: this.players,
       });
     }
   }
 
   T.Game = Game;
   Object.defineProperty(T, 'SEAT_NAMES', { get: () => tr(['You', 'East', 'North', 'West'], ['Vous', 'Est', 'Nord', 'Ouest']), enumerable: true });
-  T.TOTAL_TRICKS = TOTAL_TRICKS;
+  T.seatNames = players => (players === 3 ? tr(['You', 'East', 'West'], ['Vous', 'Est', 'Ouest']) : T.SEAT_NAMES);
 })(window.Tarot = window.Tarot || {});

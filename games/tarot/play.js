@@ -3,14 +3,15 @@
   'use strict';
   const { el, cardEl, fmt, contractName } = T;
   const tr = window.Core.t;
-  const SEAT_CLASS = ['south', 'east', 'north', 'west'];
-
+  
   function playScreen(root) {
-    const NAMES = T.SEAT_NAMES; // localized when the screen is built (re-run on language change)
-    const lc = s => String(s).toLowerCase();
     let settings = T.Settings.get();
-    const game = new T.Game({ dealer: Math.floor(Math.random() * 4) });
-    const scores = [0, 0, 0, 0];
+    let N = settings.players === 3 ? 3 : 4; // number of players
+    let NAMES = T.seatNames(N); // localized when the screen is built (re-run on language change)
+    let SEAT_CLASS = N === 3 ? ['south', 'east', 'west'] : ['south', 'east', 'north', 'west'];
+    const lc = s => String(s).toLowerCase();
+    let game = new T.Game({ players: N, dealer: Math.floor(Math.random() * N) });
+    let scores = new Array(N).fill(0);
     const logLines = [];
     let timer = null;
     let alive = true;
@@ -82,7 +83,7 @@
     }
 
     function newDeal() {
-      game.dealer = (game.dealer + 1) % 4;
+      game.dealer = (game.dealer + 1) % N;
       game.newDeal();
       selected = new Set(); hint = null; scored = false; dealNo++;
       logLines.length = 0;
@@ -92,8 +93,17 @@
       advance();
     }
 
+    function newGame(n) {
+      N = n; NAMES = T.seatNames(N);
+      SEAT_CLASS = N === 3 ? ['south', 'east', 'west'] : ['south', 'east', 'north', 'west'];
+      game = new T.Game({ players: N, dealer: Math.floor(Math.random() * N) });
+      scores = new Array(N).fill(0);
+      dealNo = 0;
+      newDeal();
+    }
+
     function logDealStart() {
-      const d = game.dealer; const f = (game.dealer + 1) % 4;
+      const d = game.dealer; const f = (game.dealer + 1) % N;
       log(tr(`Deal ${dealNo}. ${NAMES[d]} deals; ${NAMES[f]} speaks first.`,
         `Donne ${dealNo}. ${NAMES[d]} ${d === 0 ? 'donnez' : 'donne'} ; ${NAMES[f]} ${f === 0 ? 'parlez' : 'parle'} en premier.`));
     }
@@ -153,7 +163,7 @@
       const n = game.hands[p].length;
       return el('div', { class: 'seat ' + SEAT_CLASS[p] },
         el('div', { class: 'name' }, NAMES[p], ' ', chips),
-        p === 0 ? null : el('div', { class: 'backs' }, [...Array(Math.min(n, p === 2 ? 12 : 7))].map(() => cardEl(null, { back: true }))),
+        p === 0 ? null : el('div', { class: 'backs' }, [...Array(Math.min(n, p === 2 && N === 4 ? 12 : 7))].map(() => cardEl(null, { back: true }))),
         p === 0 ? null : el('div', { class: 'muted', style: 'color:#cfe' }, tr(`${n} cards`, `${n} cartes`)));
     }
 
@@ -187,8 +197,8 @@
         area.append(el('div', { class: 'dog-row' }, g.dog.map(c => cardEl(c))));
       } else if (g.phase === 'play' || g.phase === 'done') {
         const wi = g.trickComplete ? T.trickWinnerIndex(g.trick) : -1;
-        const grid = el('div', { class: 'trick-grid' });
-        for (let p = 0; p < 4; p++) {
+        const grid = el('div', { class: 'trick-grid' + (N === 3 ? ' three' : '') });
+        for (let p = 0; p < N; p++) {
           const idx = g.trick.findIndex(x => x.player === p);
           const slot = idx >= 0
             ? cardEl(g.trick[idx].card, { cls: 'p' + p + (idx === wi ? ' winner' : '') })
@@ -248,13 +258,13 @@
       const box = el('div', { class: 'panel' }, el('h3', {}, '🎓 Coach'));
       if (!settings.hints) { box.append(el('p', { class: 'muted' }, tr('Hints are off. Enable them below.', 'Les conseils sont désactivés. Activez-les ci-dessous.'))); return box; }
       if (g.phase === 'bidding' && g.bidder === 0) {
-        const ev = T.Bots.evaluateHand(g.hands[0]);
+        const ev = T.Bots.evaluateHand(g.hands[0], N);
         const higher = !g.highest || (ev.level && T.CONTRACTS[ev.level].level > T.CONTRACTS[g.highest.contract].level);
         box.append(el('div', { class: 'coach-box' },
           el('div', {}, tr('Hand strength: ', 'Force de la main : '), el('strong', {}, fmt(ev.score))),
           el('div', {}, tr('Suggestion: ', 'Suggestion : '), el('strong', {}, ev.level && higher ? contractName(ev.level) : tr('Pass', 'Passer'))),
           T.Drills.evalTable(ev)),
-          el('p', { class: 'muted' }, tr('15+ → Petite, 22+ → Garde, 30+ → Garde Sans. A rough guide only.', '15+ → Petite, 22+ → Garde, 30+ → Garde sans. Simple repère, rien de plus.')));
+          el('p', { class: 'muted' }, tr('15+ → Petite, 22+ → Garde, 30+ → Garde Sans. A rough guide only.', '15+ → Petite, 22+ → Garde, 30+ → Garde sans. Simple repère, rien de plus.') + (N === 3 ? tr(' (With 24 cards each, the strength is scaled down by a quarter.)', ' (À 24 cartes chacun, la force est réduite d\'un quart.)') : '')));
       } else if (g.phase === 'discard' && g.taker === 0) {
         box.append(el('p', {}, tr('Discard 6 cards: no kings, no oudlers, and trumps only if you have no other choice. Aim to empty your short suits.', 'Écartez 6 cartes : ni rois, ni bouts, et des atouts seulement si vous n\'avez pas d\'autre choix. Cherchez à vider vos couleurs courtes.')),
           hint && hint.reason ? el('div', { class: 'coach-box' }, hint.reason) : null);
@@ -275,7 +285,7 @@
       const rows = [];
       if (g.contract) {
         rows.push([tr('Contract', 'Contrat'), tr(`${contractName(g.contract)} by ${NAMES[g.taker]}`, `${contractName(g.contract)} par ${NAMES[g.taker]}`)]);
-        rows.push([tr('Trick', 'Pli'), `${Math.min(g.trickNo + (g.trickComplete ? 0 : 1), 18)} / 18`]);
+        rows.push([tr('Trick', 'Pli'), `${Math.min(g.trickNo + (g.trickComplete ? 0 : 1), g.totalTricks)} / ${g.totalTricks}`]);
         if (settings.count) {
           const o = g.takerOudlersSoFar();
           rows.push([tr('Taker pts so far', 'Points du preneur'), `${fmt(g.takerPointsSoFar())}`]);
@@ -295,7 +305,10 @@
         ['explain', tr("Explain bots' choices in the log", 'Expliquer les choix des bots dans le journal')],
         ['count', tr('Show live point count', 'Afficher le décompte des points en direct')],
       ];
-      return el('div', { class: 'panel' }, el('h3', {}, tr('Learning aids', 'Aides à l\'apprentissage')), defs.map(([k, label]) =>
+      const players = el('label', { class: 'switch' }, tr('Players: ', 'Joueurs : '),
+        el('select', { onchange: e => { settings.players = +e.target.value; T.Settings.set(settings); newGame(settings.players); } },
+          [4, 3].map(n => el('option', { value: n, selected: n === N ? true : null }, tr(`${n} players`, `${n} joueurs`)))));
+      return el('div', { class: 'panel' }, el('h3', {}, tr('Learning aids', 'Aides à l\'apprentissage')), players, defs.map(([k, label]) =>
         el('label', { class: 'switch' },
           el('input', { type: 'checkbox', checked: settings[k] ? true : null, onchange: e => {
             settings[k] = e.target.checked; T.Settings.set(settings); hint = null; render();
@@ -311,7 +324,7 @@
 
     function scorePanel() {
       return el('div', { class: 'panel' }, el('h3', {}, tr('Total score', 'Score total')),
-        el('table', { class: 'score-pill' }, [0, 1, 2, 3].map(p =>
+        el('table', { class: 'score-pill' }, [...Array(N).keys()].map(p =>
           el('tr', {}, el('td', {}, NAMES[p] + ' '), el('td', { class: scores[p] < 0 ? 'bad' : '' }, (scores[p] > 0 ? '+' : '') + scores[p])))));
     }
 
@@ -343,7 +356,7 @@
           el('tr', {}, el('th', {}, tr('Taker\'s points', 'Points du preneur')), el('td', {}, tr(`${fmt(r.takerPoints)} (defenders ${fmt(r.defPoints)})`, `${fmt(r.takerPoints)} (défenseurs ${fmt(r.defPoints)})`))),
           el('tr', {}, el('th', {}, tr('Difference', 'Différence')), el('td', {}, tr(`${r.diff >= 0 ? '+' : ''}${fmt(r.diff)} → rounded ${r.gap}`, `${r.diff >= 0 ? '+' : ''}${fmt(r.diff)} → arrondi à ${r.gap}`))),
           el('tr', {}, el('th', {}, tr('Score', 'Score')), el('td', {}, `${r.win ? '' : '−'}${formula} × ${r.mult} = ${r.perDefender >= 0 ? '+' : ''}${r.perDefender}`))),
-        el('p', {}, tr(`The taker gets ${fmt(r.perDefender * 3)}, each defender gets ${fmt(-r.perDefender)}. `, `Le preneur marque ${fmt(r.perDefender * 3)}, chaque défenseur marque ${fmt(-r.perDefender)}. `),
+        el('p', {}, tr(`The taker gets ${fmt(r.perDefender * (N - 1))}, each defender gets ${fmt(-r.perDefender)}. `, `Le preneur marque ${fmt(r.perDefender * (N - 1))}, chaque défenseur marque ${fmt(-r.perDefender)}. `),
           el('strong', {}, tr(`Your result: ${me > 0 ? '+' : ''}${me}`, `Votre résultat : ${me > 0 ? '+' : ''}${me}`))),
         el('div', { class: 'btn-row' },
           el('button', { class: 'btn primary', onclick: newDeal }, tr('Next deal', 'Donne suivante')),

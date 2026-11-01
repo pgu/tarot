@@ -24,6 +24,8 @@
     const hand = new Set();
     const dog = new Set();
     let target = 'hand';
+    let np = 4; // number of players: 4 → 18 cards each, 3 → 24 cards each
+    const handSize = () => (np === 3 ? 24 : 18);
     const results = el('div', {});
     const picker = el('div', { class: 'picker' });
     const status = el('p', {});
@@ -42,7 +44,7 @@
         node.addEventListener('click', () => {
           const mine = target === 'hand' ? hand : dog;
           const other = target === 'hand' ? dog : hand;
-          const max = target === 'hand' ? 18 : 6;
+          const max = target === 'hand' ? handSize() : 6;
           if (other.has(id)) return;
           if (mine.has(id)) mine.delete(id);
           else if (mine.size < max) mine.add(id);
@@ -53,7 +55,7 @@
     }
 
     function adviceBlock(title, cards, extra) {
-      const ev = T.Bots.evaluateHand(cards);
+      const ev = T.Bots.evaluateHand(cards, np);
       const box = el('div', { class: 'panel', style: 'margin-top:14px' }, el('h3', {}, title));
       box.append(el('div', { class: 'hand flat' }, cards.map(c => cardEl(c))));
       box.append(el('p', {}, tr('Hand strength ', 'Force de la main '), el('strong', {}, fmt(ev.score)), tr('. Suggested bid: ', '. Enchère conseillée : '),
@@ -71,9 +73,9 @@
 
     function renderResults() {
       results.innerHTML = '';
-      if (hand.size !== 18) return;
+      if (hand.size !== handSize()) return;
       const cards = byId(hand);
-      const ev = T.Bots.evaluateHand(cards);
+      const ev = T.Bots.evaluateHand(cards, np);
       results.append(adviceBlock(tr('1 · Bidding advice', '1 · Conseil pour les enchères'), cards,
         el('p', { class: 'muted' }, ev.level
           ? tr(`If nobody has bid higher, ${contractName(ev.level)} looks reasonable. Always bid one level above the previous bid, and remember the multiplier: ×${T.CONTRACTS[ev.level].mult}.`,
@@ -85,7 +87,7 @@
         const kept = full.filter(c => !d.cards.includes(c));
         results.append(el('div', { class: 'panel', style: 'margin-top:14px' },
           el('h3', {}, tr('2 · After taking the dog', '2 · Après avoir pris le chien')),
-          el('p', {}, tr('Your 24 cards: ', 'Vos 24 cartes : ')), el('div', { class: 'hand flat' }, full.map(c => cardEl(c, { cls: d.cards.includes(c) ? 'dim' : '' }))),
+          el('p', {}, tr(`Your ${full.length} cards: `, `Vos ${full.length} cartes : `)), el('div', { class: 'hand flat' }, full.map(c => cardEl(c, { cls: d.cards.includes(c) ? 'dim' : '' }))),
           el('p', {}, el('strong', {}, tr('Suggested discard (greyed): ', 'Écart suggéré (grisé) : ')), d.reason),
           el('div', { class: 'cards-row' }, d.cards.map(c => cardEl(c))),
           adviceBlock(tr('3 · Your hand after the discard', '3 · Votre main après l\'écart'), kept, leadAdvice(kept))));
@@ -98,8 +100,9 @@
     }
 
     function update() {
-      status.textContent = tr(`Your hand: ${hand.size}/18 cards · Dog: ${dog.size}/6 cards`, `Votre main : ${hand.size}/18 cartes · Chien : ${dog.size}/6 cartes`);
+      status.textContent = tr(`Your hand: ${hand.size}/${handSize()} cards · Dog: ${dog.size}/6 cards`, `Votre main : ${hand.size}/${handSize()} cartes · Chien : ${dog.size}/6 cartes`);
       modeRow.querySelectorAll('button').forEach(b => b.classList.toggle('primary', b.dataset.mode === target));
+      modeRow.querySelector('[data-mode=hand]').textContent = tr(`Marking: my hand (${handSize()})`, `Je marque : ma main (${handSize()})`);
       refreshPicker();
       renderResults();
     }
@@ -107,20 +110,22 @@
     function randomHand() {
       const deck = T.shuffle(T.DECK.slice());
       hand.clear(); dog.clear();
-      deck.slice(0, 18).forEach(c => hand.add(c.id));
+      deck.slice(0, handSize()).forEach(c => hand.add(c.id));
       target = 'hand';
       update();
     }
 
     modeRow.append(
-      el('button', { class: 'btn', 'data-mode': 'hand', onclick: () => { target = 'hand'; update(); } }, tr('Marking: my hand (18)', 'Je marque : ma main (18)')),
+      el('button', { class: 'btn', 'data-mode': 'hand', onclick: () => { target = 'hand'; update(); } }, tr(`Marking: my hand (${handSize()})`, `Je marque : ma main (${handSize()})`)),
       el('button', { class: 'btn', 'data-mode': 'dog', onclick: () => { target = 'dog'; update(); } }, tr('Marking: the dog (6)', 'Je marque : le chien (6)')),
+      el('select', { onchange: e => { np = +e.target.value; hand.clear(); dog.clear(); target = 'hand'; update(); } },
+        [4, 3].map(n => el('option', { value: n }, tr(`${n} players`, `${n} joueurs`)))),
       el('button', { class: 'btn', onclick: randomHand }, tr('🎲 Random hand', '🎲 Main au hasard')),
       el('button', { class: 'btn', onclick: () => { hand.clear(); dog.clear(); target = 'hand'; update(); } }, tr('Clear', 'Effacer')));
 
     root.append(el('div', { class: 'panel' },
       el('h2', {}, tr('Hand Advisor', 'Conseiller')),
-      el('p', { class: 'muted' }, tr('Playing a real game with real cards? Tap the cards you were dealt (18 for 4 players). You get a hand evaluation, a bid suggestion and, if you take the dog, the cards to discard and what to lead first.', 'Vous jouez une vraie partie avec de vraies cartes ? Touchez les cartes que vous avez reçues (18 à 4 joueurs). Vous obtenez une évaluation de votre main, une suggestion d\'enchère et, si vous prenez le chien, les cartes à écarter et votre première entame.')),
+      el('p', { class: 'muted' }, tr('Playing a real game with real cards? Tap the cards you were dealt (18 for 4 players, 24 for 3 players). You get a hand evaluation, a bid suggestion and, if you take the dog, the cards to discard and what to lead first.', 'Vous jouez une vraie partie avec de vraies cartes ? Touchez les cartes que vous avez reçues (18 à 4 joueurs, 24 à 3 joueurs). Vous obtenez une évaluation de votre main, une suggestion d\'enchère et, si vous prenez le chien, les cartes à écarter et votre première entame.')),
       modeRow, status, picker), results);
     update();
   }
