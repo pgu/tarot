@@ -29,6 +29,7 @@
     /* ---------- helpers ---------- */
     const humanToAct = () =>
       (game.phase === 'bidding' && game.bidder === 0) ||
+      (game.phase === 'chelem' && game.taker === 0) ||
       ((game.phase === 'dog' || game.phase === 'discard') && game.taker === 0) ||
       (game.phase === 'play' && game.turn === 0);
 
@@ -46,6 +47,8 @@
         const trumps = ev.cards.filter(c => c.suit === 'T');
         log(tr(`${n} discards 6 cards` + (trumps.length ? ` (including trumps: ${trumps.map(c => c.rank).join(', ')})` : '') + '.',
           `${n} ${you ? 'écartez' : 'écarte'} 6 cartes` + (trumps.length ? ` (dont des atouts : ${trumps.map(c => c.rank).join(', ')})` : '') + '.'), why);
+      } else if (ev.kind === 'chelem') {
+        if (ev.announce) log(tr(`${n} ${you ? 'announce' : 'announces'} a Chelem and will lead.`, `${n} ${you ? 'annoncez' : 'annonce'} un chelem et ${you ? 'entamez' : 'entame'}.`));
       } else if (ev.kind === 'poignee') {
         log(tr(`${n} ${you ? 'announce' : 'announces'} a ${T.poigneeName(ev.level)} Poignée (${ev.cards.length} trumps, +${ev.points}).`,
           `${n} ${you ? 'annoncez' : 'annonce'} une poignée ${T.poigneeName(ev.level)} (${ev.cards.length} atouts, +${ev.points}).`), why);
@@ -82,7 +85,7 @@
         return;
       }
       if (humanToAct()) return;
-      later(game.phase === 'dog' ? 1800 : 750, () => { logEvent(game.botStep()); advance(); });
+      later(game.phase === 'dog' ? 1800 : game.phase === 'chelem' ? 60 : 750, () => { logEvent(game.botStep()); advance(); });
     }
 
     function newDeal() {
@@ -125,6 +128,12 @@
       advance();
     }
 
+    function humanChelem(announce) {
+      logEvent({ kind: 'chelem', player: 0, announce });
+      game.announceChelem(announce);
+      advance();
+    }
+
     function humanPoignee(level) {
       const rec = game.announcePoignee(0, level);
       logEvent({ kind: 'poignee', player: 0, level: rec.level, points: rec.points, cards: rec.cards });
@@ -162,7 +171,7 @@
     /* ---------- rendering ---------- */
     function seat(p) {
       const chips = [];
-      if (game.taker === p) chips.push(el('span', { class: 'chip taker' }, tr('Taker', 'Preneur') + ' · ' + contractName(game.contract)));
+      if (game.taker === p) chips.push(el('span', { class: 'chip taker' }, tr('Taker', 'Preneur') + ' · ' + contractName(game.contract) + (game.chelemAnnounced ? ' · Chelem' : '')));
       else if (game.phase === 'bidding') {
         const b = game.bids.find(x => x.player === p);
         if (b) chips.push(el('span', { class: 'chip' }, contractName(b.contract)));
@@ -179,6 +188,9 @@
     function message() {
       const g = game;
       if (g.phase === 'bidding') return g.bidder === 0 ? tr('Your turn to bid.', 'À vous d\'annoncer.') : tr(`${NAMES[g.bidder]} is thinking…`, `${NAMES[g.bidder]} réfléchit…`);
+      if (g.phase === 'chelem') return g.taker === 0
+        ? tr('Do you announce a Chelem (win every trick)?', 'Annoncez-vous un chelem (remporter tous les plis) ?')
+        : tr(`${NAMES[g.taker]} decides whether to announce a Chelem…`, `${NAMES[g.taker]} décide d'annoncer ou non un chelem…`);
       if (g.phase === 'passed') return tr('Everybody passed. Nobody takes the contract.', 'Tout le monde a passé. Personne ne prend le contrat.');
       if (g.phase === 'dog') return g.taker === 0
         ? tr(`You won the bidding with ${contractName(g.contract)}. This is the dog:`, `Vous avez remporté les enchères avec ${contractName(g.contract)}. Voici le chien :`)
@@ -190,7 +202,7 @@
       }
       if (g.phase === 'play') {
         if (g.trickComplete) {
-          const w = g.trick[T.trickWinnerIndex(g.trick)].player;
+          const w = g.trick[g.trickWinnerIdx()].player;
           return tr(`${NAMES[w]} wins the trick.`, `${NAMES[w]} ${w === 0 ? 'remportez' : 'remporte'} le pli.`);
         }
         if (g.turn === 0) return g.trick.length ? tr('Your turn. Follow the rules of the trick.', 'À vous. Respectez les règles du pli.') : tr('You lead the trick.', 'Vous entamez le pli.');
@@ -205,7 +217,7 @@
       if (g.phase === 'dog' || (g.phase === 'discard' && g.taker !== 0)) {
         area.append(el('div', { class: 'dog-row' }, g.dog.map(c => cardEl(c))));
       } else if (g.phase === 'play' || g.phase === 'done') {
-        const wi = g.trickComplete ? T.trickWinnerIndex(g.trick) : -1;
+        const wi = g.trickComplete ? g.trickWinnerIdx() : -1;
         const grid = el('div', { class: 'trick-grid' + (N === 3 ? ' three' : '') });
         for (let p = 0; p < N; p++) {
           const idx = g.trick.findIndex(x => x.player === p);
@@ -230,6 +242,9 @@
           box.append(el('button', { class: 'btn primary', disabled: !g.canBid(k), onclick: () => humanBid(k) }, `${T.CONTRACTS[k].name} (×${T.CONTRACTS[k].mult})`));
         });
         if (g.highest) box.append(el('div', { class: 'muted', style: 'color:#cfe' }, tr(`Current bid: ${contractName(g.highest.contract)} by ${NAMES[g.highest.player]}`, `Enchère actuelle : ${contractName(g.highest.contract)} par ${NAMES[g.highest.player]}`)));
+      } else if (g.phase === 'chelem' && g.taker === 0) {
+        box.append(el('button', { class: 'btn', onclick: () => humanChelem(false) }, tr('No Chelem', 'Pas de chelem')),
+          el('button', { class: 'btn primary', title: tr('+400 if you win every trick, −200 if you fail. You lead the first trick.', '+400 si vous remportez tous les plis, −200 sinon. Vous entamez le premier pli.'), onclick: () => humanChelem(true) }, tr('Announce a Chelem (+400 / −200)', 'Annoncer un chelem (+400 / −200)')));
       } else if (g.phase === 'dog' && g.taker === 0) {
         box.append(el('button', { class: 'btn primary', onclick: () => { g.takeDog(); log(tr('You take the dog.', 'Vous prenez le chien.')); advance(); } }, tr('Take the dog into your hand', 'Prendre le chien dans votre main')));
       } else if (g.phase === 'discard' && g.taker === 0) {
@@ -281,6 +296,11 @@
       } else if (g.phase === 'discard' && g.taker === 0) {
         box.append(el('p', {}, tr('Discard 6 cards: no kings, no oudlers, and trumps only if you have no other choice. Aim to empty your short suits.', 'Écartez 6 cartes : ni rois, ni bouts, et des atouts seulement si vous n\'avez pas d\'autre choix. Cherchez à vider vos couleurs courtes.')),
           hint && hint.reason ? el('div', { class: 'coach-box' }, hint.reason) : null);
+      } else if (g.phase === 'chelem' && g.taker === 0) {
+        const ev = T.Bots.evaluateHand(g.hands[0], N);
+        box.append(el('p', {}, tr('A Chelem means winning every trick, Excuse included. Announced and made: +400. Announced and failed: −200. Made without announcing: +200. Only try it with all 3 oudlers and a mass of trumps and kings.', 'Un chelem, c\'est remporter tous les plis, Excuse comprise. Annoncé et réussi : +400. Annoncé et chuté : −200. Réussi sans annonce : +200. À tenter seulement avec les 3 bouts et beaucoup d\'atouts et de rois.')),
+          el('div', { class: 'coach-box' }, tr(`Your hand: ${ev.oudlers} oudler(s), ${ev.trumps} trumps, ${ev.kings} king(s) → `, `Votre main : ${ev.oudlers} bout(s), ${ev.trumps} atouts, ${ev.kings} roi(s) → `),
+            el('strong', {}, T.Bots.wantsChelem(g.hands[0], N) ? tr('worth announcing', 'à annoncer') : tr('too risky', 'trop risqué'))));
       } else if (g.phase === 'play' && g.turn === 0) {
         const info = g.legalFor(0);
         if (g.poigneeOptions(0).length) box.append(el('div', { class: 'coach-box' }, tr('You hold enough trumps to announce a Poignée: a bonus for your camp if it wins the deal. You must announce it before your first card.', 'Vous avez assez d\'atouts pour annoncer une poignée : une prime pour votre camp s\'il gagne la donne. Il faut l\'annoncer avant votre première carte.')));
@@ -366,6 +386,8 @@
       const takerName = NAMES[r.taker];
       const close = () => { modalHost.innerHTML = ''; modalOpen = false; };
       const formula = `(25 + ${r.gap})${r.petit ? (r.petit > 0 ? ' + 10' : ' − 10') + ' (Petit au bout)' : ''}`;
+      const ch = r.chelem;
+      const chelemText = ch.bonus ? ` ${ch.bonus > 0 ? '+' : '−'} ${Math.abs(ch.bonus)} (${tr('Chelem', 'chelem')})` : '';
       const poigneeText = r.poignee ? ` ${r.poignee > 0 ? '+' : '−'} ${Math.abs(r.poignee)} (${tr('Poignée', 'poignée')})` : '';
       const takerYou = r.taker === 0;
       modalOpen = true;
@@ -378,7 +400,10 @@
           el('tr', {}, el('th', {}, tr('Taker\'s oudlers', 'Bouts du preneur')), el('td', {}, tr(`${r.oudlers} → needs ${r.required} points`, `${r.oudlers} → ${r.required} points requis`))),
           el('tr', {}, el('th', {}, tr('Taker\'s points', 'Points du preneur')), el('td', {}, tr(`${fmt(r.takerPoints)} (defenders ${fmt(r.defPoints)})`, `${fmt(r.takerPoints)} (défenseurs ${fmt(r.defPoints)})`))),
           el('tr', {}, el('th', {}, tr('Difference', 'Différence')), el('td', {}, tr(`${r.diff >= 0 ? '+' : ''}${fmt(r.diff)} → rounded ${r.gap}`, `${r.diff >= 0 ? '+' : ''}${fmt(r.diff)} → arrondi à ${r.gap}`))),
-          el('tr', {}, el('th', {}, tr('Score', 'Score')), el('td', {}, `${r.win ? '' : '−'}${formula} × ${r.mult}${poigneeText} = ${r.perDefender >= 0 ? '+' : ''}${r.perDefender}`))),
+          ch.announced || ch.made ? el('tr', {}, el('th', {}, 'Chelem'), el('td', {}, ch.announced
+            ? (ch.made ? tr('Announced and made!', 'Annoncé et réussi !') : tr('Announced but failed', 'Annoncé mais chuté'))
+            : tr('Made without announcing', 'Réussi sans annonce'))) : null,
+          el('tr', {}, el('th', {}, tr('Score', 'Score')), el('td', {}, `${r.win ? '' : '−'}${formula} × ${r.mult}${poigneeText}${chelemText} = ${r.perDefender >= 0 ? '+' : ''}${r.perDefender}`))),
         el('p', {}, tr(`The taker gets ${fmt(r.perDefender * (N - 1))}, each defender gets ${fmt(-r.perDefender)}. `, `Le preneur marque ${fmt(r.perDefender * (N - 1))}, chaque défenseur marque ${fmt(-r.perDefender)}. `),
           el('strong', {}, tr(`Your result: ${me > 0 ? '+' : ''}${me}`, `Votre résultat : ${me > 0 ? '+' : ''}${me}`))),
         el('div', { class: 'btn-row' },

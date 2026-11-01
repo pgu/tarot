@@ -108,8 +108,11 @@
     return null;
   }
 
+  /* Chelem: the taker's camp wins every trick. Bonuses are not multiplied by the contract. */
+  const CHELEM_BONUS = { announcedMade: 400, silentMade: 200, announcedFailed: -200 };
+
   Object.assign(T, {
-    POIGNEE_MIN, POIGNEE_POINTS, poigneeName, poigneeCards,
+    CHELEM_BONUS, POIGNEE_MIN, POIGNEE_POINTS, poigneeName, poigneeCards,
     CONTRACTS, CONTRACT_ORDER, RULE_TEXT,
     leadSuit, legalInfo, legalCards, trickWinnerIndex, requiredPoints, validateDiscard,
   });

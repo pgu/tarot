@@ -50,6 +50,12 @@
     return { score, details, level, trumps: trumps.length, oudlers: oudlers.length, kings: kings.length, voids, counts };
   }
 
+  /** The taker announces a Chelem only with a monster hand: 3 oudlers, lots of trumps and kings. */
+  function wantsChelem(hand, players) {
+    const ev = evaluateHand(hand, players);
+    return ev.oudlers === 3 && ev.trumps >= (players === 3 ? 14 : 11) && ev.kings >= 2;
+  }
+
   const levelOf = key => (key ? T.CONTRACTS[key].level : 0);
 
   function chooseBid(hand, highest, aggr, players) {
@@ -189,5 +195,5 @@
     return { card: sacrifice, reason: tr('You cannot win this trick: give away your least valuable card.', 'Vous ne pouvez pas gagner ce pli : donnez votre carte la moins précieuse.') };
   }
 
-  T.Bots = { evaluateHand, chooseBid, chooseDiscard, choosePlay, sameTeam, fmt };
+  T.Bots = { wantsChelem, evaluateHand, chooseBid, chooseDiscard, choosePlay, sameTeam, fmt };
 })(window.Tarot = window.Tarot || {});

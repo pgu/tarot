@@ -30,6 +30,8 @@
       this.trickNo = 0;
       this.history = [];
       this.poignees = [];
+      this.chelemAnnounced = false;
+      this.takerTricks = 0;
       this.poigneeChecked = new Set();
       this.leader = null;
       this.turn = null;
@@ -86,12 +88,21 @@
       this.startPlay();
     }
 
+    /** The taker may announce a Chelem (win every trick) before play starts; the announcer then leads. */
     startPlay() {
-      this.phase = 'play';
-      this.leader = (this.dealer + 1) % this.players;
-      this.turn = this.leader;
+      this.phase = 'chelem';
+      this.leader = null;
+      this.turn = null;
       this.trick = [];
       this.trickNo = 0;
+    }
+
+    announceChelem(announce) {
+      if (this.phase !== 'chelem') throw new Error(tr('No Chelem to announce now', 'Pas de chelem à annoncer maintenant.'));
+      this.chelemAnnounced = !!announce;
+      this.phase = 'play';
+      this.leader = announce ? this.taker : (this.dealer + 1) % this.players;
+      this.turn = this.leader;
     }
 
     /* ----- play ----- */
@@ -129,10 +140,21 @@
 
     get trickComplete() { return this.trick.length === this.players; }
 
+    /** Index in the trick of the winning card. In the last trick, the taker's Excuse wins it when the taker took all the others (Chelem). */
+    trickWinnerIdx() {
+      const last = this.trickNo === this.totalTricks - 1;
+      if (last && this.takerTricks === this.totalTricks - 1) {
+        const i = this.trick.findIndex(p => p.card.suit === 'X' && p.player === this.taker);
+        if (i >= 0) return i;
+      }
+      return T.trickWinnerIndex(this.trick);
+    }
+
     collectTrick() {
       if (!this.trickComplete) throw new Error(tr('Trick not complete', 'Le pli n\'est pas terminé.'));
-      const idx = T.trickWinnerIndex(this.trick);
+      const idx = this.trickWinnerIdx();
       const winner = this.trick[idx].player;
+      if (winner === this.taker) this.takerTricks++;
       const winTeam = this.team(winner);
       const last = this.trickNo === this.totalTricks - 1;
       let cards = this.trick.map(p => p.card);
@@ -188,12 +210,17 @@
       // Poignée bonuses are not multiplied; they go to the camp that wins the deal.
       const poigneeTotal = this.poignees.reduce((s, p) => s + p.points, 0);
       const poignee = (win ? 1 : -1) * poigneeTotal;
-      const perDefender = (base + petit) * mult + poignee;
+      const chelemMade = this.takerTricks === this.totalTricks;
+      const chelemBonus = this.chelemAnnounced
+        ? (chelemMade ? T.CHELEM_BONUS.announcedMade : T.CHELEM_BONUS.announcedFailed)
+        : (chelemMade ? T.CHELEM_BONUS.silentMade : 0);
+      const perDefender = (base + petit) * mult + poignee + chelemBonus;
       const totals = [...Array(this.players).keys()].map(p => (p === this.taker ? perDefender * (this.players - 1) : -perDefender));
       return {
         taker: this.taker, contract: this.contract, takerPoints, defPoints: 91 - takerPoints,
         oudlers, required, diff, win, gap, mult, base, petit, perDefender, totals,
         petitAuBout: this.petitAuBout || null, players: this.players, poignees: this.poignees.slice(), poignee,
+        chelem: { announced: this.chelemAnnounced, made: chelemMade, bonus: chelemBonus },
       };
     }
 
@@ -206,6 +233,11 @@
         const r = T.Bots.chooseBid(this.hands[p], this.highest, this.aggr[p], this.players);
         this.bid(p, r.contract);
         return { kind: 'bid', player: p, contract: r.contract, reason: r.reason };
+      }
+      if (this.phase === 'chelem') {
+        const announce = T.Bots.wantsChelem(this.hands[this.taker], this.players);
+        this.announceChelem(announce);
+        return { kind: 'chelem', player: this.taker, announce };
       }
       if (this.phase === 'dog') {
         this.takeDog();

@@ -28,7 +28,7 @@ Repo **Settings → Pages → Deploy from a branch → `main` / root**.
 
 ## Tests
 ```
-node test/tarot.sim.js 1000   # bot-only Tarot deals: 78 cards accounted for, 91 points, zero-sum scores, Poignée thresholds and scoring (LANG_FR=1 to run in French)
+node test/tarot.sim.js 1000   # bot-only Tarot deals: 78 cards accounted for, 91 points, zero-sum scores, Poignée and Chelem rules and scoring (LANG_FR=1 to run in French)
 node test/poker.eval.js       # hand evaluator, equity, outs, Chen score
 node test/poker.sim.js 1500   # bot-only Hold'em hands: chips conserved, side pots add up
 node test/draw.sim.js 1500    # bot-only 5-card draw hands (draw phase, chips, pots)
@@ -63,7 +63,7 @@ To add a game: create `games/<id>/`, build screens as `fn(root, params)`, call `
 Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
-- **Tarot:** no Chelem or 5-player variant (Poignée is implemented) (3 and 4 players supported); automatic Excuse exchange.
+- **Tarot:** no 5-player variant (Poignée and Chelem are implemented) (3 and 4 players supported); automatic Excuse exchange.
 - **Brisca:** 2 players only, no "cambiar el siete". Reuses the Tute card order, points and trick AI (games/tute).
 - **Cinquillo:** 3-4 players, passing only when no card is playable (free), scoring = cards left in the others' hands, to 30.
 - **Siete y medio:** no chips or bets: each duel won against the bank is 1 point (2 with a natural 7½); the bank rotates; to 12.
