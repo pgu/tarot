@@ -207,7 +207,8 @@
         }
         area.append(grid);
       }
-      area.append(el('div', { class: 'msg' }, message()));
+      area.append(el('div', { class: 'msg' }, message()),
+        el('div', { class: 'muted', style: 'color:#cfe;font-size:.8rem' }, tr('↺ Play goes counter-clockwise', '↺ Le jeu tourne dans le sens inverse des aiguilles d\'une montre')));
       return area;
     }
 

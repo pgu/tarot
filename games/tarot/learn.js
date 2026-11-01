@@ -91,7 +91,7 @@
       title: () => tr('Bidding', 'Les enchères'),
       body: () => {
         const d = el('div', { html: tr(`
-          <p>Starting with the player right after the dealer, each player speaks <strong>once</strong>: either <strong>pass</strong> or make a bid higher than the previous one.
+          <p>Starting with the player right after the dealer (the game always goes <strong>counter-clockwise</strong>), each player speaks <strong>once</strong>: either <strong>pass</strong> or make a bid higher than the previous one.
           The highest bid wins and that player becomes the taker. If everybody passes, the cards are re-dealt.</p>
           <table class="t"><tr><th>Bid</th><th>Multiplier</th><th>The dog…</th></tr>
             <tr><td><strong>Petite</strong> (small)</td><td>×1</td><td>shown to all; the taker adds it to their hand and discards 6 cards</td></tr>
@@ -108,7 +108,7 @@
             <li><strong>Voids</strong>: having no card in a suit lets you cut it with a trump.</li>
           </ul>
           <p>Try a few hands. The coach gives you the reasoning after each guess:</p>`, `
-          <p>En commençant par le joueur situé juste après le donneur, chacun parle <strong>une seule fois</strong> : soit il <strong>passe</strong>, soit il annonce un contrat plus élevé que le précédent.
+          <p>En commençant par le joueur situé juste après le donneur (le jeu tourne toujours <strong>dans le sens inverse des aiguilles d'une montre</strong>), chacun parle <strong>une seule fois</strong> : soit il <strong>passe</strong>, soit il annonce un contrat plus élevé que le précédent.
           La plus haute enchère l'emporte et ce joueur devient le preneur. Si tout le monde passe, on redistribue les cartes.</p>
           <table class="t"><tr><th>Contrat</th><th>Multiplicateur</th><th>Le chien…</th></tr>
             <tr><td><strong>Petite</strong></td><td>×1</td><td>montré à tous ; le preneur le prend dans sa main et fait un écart de 6 cartes</td></tr>
@@ -359,6 +359,7 @@
       el('p', {}, el('strong', {}, tr('Points needed: ', 'Points à faire : ')), tr('0 oudlers → 56 · 1 → 51 · 2 → 41 · 3 → 36.', '0 bout → 56 · 1 → 51 · 2 → 41 · 3 → 36.')),
       el('p', {}, el('strong', {}, tr('Card values: ', 'Valeur des cartes : ')), tr('K 4.5 · Q 3.5 · C 2.5 · J 1.5 · oudlers 4.5 · others 0.5 (total 91). Counting in pairs (face card + a 0.5 card), a King is "5".', 'R 4,5 · D 3,5 · C 2,5 · V 1,5 · bouts 4,5 · autres 0,5 (total 91). En comptant par paires (figure + une carte de 0,5), un roi vaut « 5 ».')),
       el('p', {}, el('strong', {}, tr('Score: ', 'Score : ')), tr('(25 + |points − needed|) × multiplier, positive if made, negative if failed; ±10×multiplier for Petit au bout. The taker scores ×3 (×2 with 3 players), each defender scores the opposite.', '(25 + |points faits − points à faire|) × multiplicateur, positif si le contrat est rempli, négatif s\'il chute ; ±10 × multiplicateur pour le petit au bout. Le preneur marque ×3 (×2 à 3 joueurs), chaque défenseur marque l\'opposé.')),
+      el('p', {}, el('strong', {}, tr('Direction: ', 'Sens du jeu : ')), tr('counter-clockwise, for the deal, the bidding and the play. The player after the dealer speaks first and leads the first trick.', 'sens inverse des aiguilles d\'une montre, pour la distribution, les enchères et le jeu. Le joueur après le donneur parle en premier et entame le premier pli.')),
       el('h3', {}, tr('Glossary', 'Lexique')),
       el('table', { class: 't' }, gloss.map(([a, b]) => el('tr', {}, el('th', {}, a), el('td', {}, b)))),
       el('h3', {}, tr('Simplifications in this version', 'Simplifications de cette version')),
