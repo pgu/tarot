@@ -17,6 +17,8 @@ Learn and play classic card games in the browser, with lessons, practice drills,
 | **El Cinquillo** (3–4 players, classic rule) | available |
 | **El Siete y medio** (3–4 players) | available |
 | **La Podrida** (3–5 players) | available |
+| **La Belote** (4 players, 2 teams, 32 cards) | available · French only |
+| **Le Bridge** (rubber, 4 players, 52 cards) | available · French only |
 
 Each game offers: **Learn** (lessons), **Practice** (drills), **Play** (vs bots, with coach and learning aids), **Hand Advisor** (enter your real cards) and **Reference** (rules, glossary).
 
@@ -40,6 +42,8 @@ node test/brisca.sim.js 500   # bot-only Brisca hands: 120 points, 40 cards cons
 node test/cinquillo.sim.js 200 # bot-only Cinquillo games (3-4 players): every round ends, cards conserved
 node test/sietemedio.sim.js 200 # Siete y medio: values, risk maths, bot-only games
 node test/podrida.sim.js 100  # Podrida: scoring, schedule, legal cards, dealer's forbidden bid, bot-only games
+node test/belote.sim.js 1000 # Belote: card order/points, legal cards (follow, cut, overcut), scoring, bot-only deals
+node test/bridge.sim.js 500  # Bridge: scoring table, rubber, auction rules, bot-only auctions and deals
 node test/rami.eval.js        # Rami combination rules (sets, runs, jokers, ace, arrangement search)
 node test/rami.sim.js 12      # bot-only Rami games: 108 cards conserved, every round ends
 ```
@@ -52,7 +56,7 @@ js/core.js            DOM helper + game registry (Core.register)
 js/app.js             router (#/<game>/<screen>/<params>) and game hub
 games/<game>/         one folder per game, registered in register.js
                       (games/draw/ builds on the engine in games/poker/, games/rami/ reuses its card faces;
-                       games/escoba/ and future Spanish games share games/spanish/)
+                       games/escoba/ and future Spanish games share games/spanish/; games/belote/ and games/bridge/ reuse the poker card faces)
   cards, rules/game, bots   engine and AI (no DOM, testable in Node)
   ui, learn, drills, play, advisor   screens
 ```
@@ -63,7 +67,9 @@ To add a game: create `games/<id>/`, build screens as `fn(root, params)`, call `
 Old Tarot URLs (`#/play`, `#/learn/3`, ...) redirect to `#/tarot/...`.
 
 ## Known simplifications
-- **Tarot:** no 5-player variant (Poignée and Chelem are implemented) (3 and 4 players supported); automatic Excuse exchange.
+- **Tarot:** 3 and 4 players (no 5-player variant); Poignée and Chelem implemented; automatic Excuse exchange.
+- **Belote:** classic 4-player belote (you + a bot partner vs 2 bots), no contrée/coinchée and no announcements (tierce, carré); points not rounded to tens; 81-81 counts as "dedans" (no litige).
+- **Bridge:** rubber only (no duplicate), no honours bonus; bots bid naturally (5-card majors, 15-17 NT, no Stayman/Blackwood/transfers, slams only in a few simple cases) and play classic but simple card play.
 - **Brisca:** 2 players only, no "cambiar el siete". Reuses the Tute card order, points and trick AI (games/tute).
 - **Cinquillo:** 3-4 players, passing only when no card is playable (free), scoring = cards left in the others' hands, to 30.
 - **Siete y medio:** no chips or bets: each duel won against the bank is 1 point (2 with a natural 7½); the bank rotates; to 12.

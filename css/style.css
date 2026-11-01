@@ -337,3 +337,23 @@ a.btn { text-decoration: none; display: inline-block; }
 /* La Podrida */
 .table.podrida { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
 .table.podrida .slot .card { display: block; margin: 0 auto 2px; }
+
+.bad-suit { color: #c0392b; }
+
+/* Bridge */
+.trick-grid.bridge .p1 { grid-area: w; } .trick-grid.bridge .p2 { grid-area: n; } .trick-grid.bridge .p3 { grid-area: e; }
+.bhand { display: flex; flex-direction: column; gap: 3px; align-items: center; --cw: 28px; }
+.bhand .cards-row { flex-wrap: nowrap; gap: 0; align-items: center; }
+.bhand .card { margin: 0 -9px 0 0; }
+.bhand .suit-tag { width: 18px; font-size: 1rem; color: #fff; text-align: center; }
+.bhand .suit-tag.bad-suit { color: #ff8c7a; }
+.drill-hand .bhand { --cw: 40px; align-items: flex-start; }
+.drill-hand .bhand .suit-tag { color: var(--ink); }
+.drill-hand .bhand .suit-tag.bad-suit { color: #c0392b; }
+.auction { border-collapse: collapse; background: rgba(0,0,0,.25); border-radius: 8px; color: #fff; min-width: 220px; }
+.auction th, .auction td { padding: 3px 10px; text-align: center; font-size: .9rem; }
+.auction th { border-bottom: 1px solid rgba(255,255,255,.25); font-weight: 700; }
+.auction td.me { color: #ffe9a6; }
+.bidpad { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.bidpad .row { display: flex; gap: 3px; justify-content: center; }
+.bidpad .btn.small { padding: 3px 7px; min-width: 38px; }
